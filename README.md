@@ -187,7 +187,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 ## Features
 
 - Reserved-name protection across **23 built-in categories**
-- **11,324 filter entries** representing **11,108 unique values**
+- **11,324 filter entries** representing **11,108 category-unique values**
 - Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
 - Global multilingual explicit, sexual, and anatomical profanity reservations under `Category.Profanity`

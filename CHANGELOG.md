@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.1 - 2026-10-01
+## 0.8.1 - 2026-10-02
 
 > **Default-behavior note:** 0.8.1 expands the existing default-on profanity protection with a language-independent multilingual explicit, sexual, and anatomical corpus. Applications that intentionally allow these identifiers should regression-test their real username corpus before upgrading.
 
