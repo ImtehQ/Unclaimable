@@ -69,7 +69,7 @@ public sealed class AdditionalLanguageTests
     {
         var options = CreateOptions();
         Assert.True(new Checker(options).IsClaimable(support), code);
-        Assert.Equal("profanity", new Checker(options).Check(profanity).Category);
+        Assert.True(new Checker(options).IsClaimable(profanity), code);
 
         options.AddLanguage(language);
         var enabled = new Checker(options);
@@ -80,7 +80,7 @@ public sealed class AdditionalLanguageTests
         options.RemoveLanguage(language);
         var removed = new Checker(options);
         Assert.True(removed.IsClaimable(support));
-        Assert.Equal("profanity", removed.Check(profanity).Category);
+        Assert.True(removed.IsClaimable(profanity));
         Assert.Contains(Language.English, options.Languages);
     }
 
