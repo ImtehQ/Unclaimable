@@ -44,6 +44,7 @@ public sealed class Profanity081Tests
     }
 
     [Theory]
+    [InlineData("myb00bname", "boob")]
     [InlineData("xxpenisxx", "penis")]
     [InlineData("myp3n1sname", "penis")]
     [InlineData("xxv4g1n4xx", "vagina")]
