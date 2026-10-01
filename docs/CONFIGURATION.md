@@ -259,7 +259,7 @@ Or disable profanity matching through the rule:
 options.DisableRule(Rule.Profanity);
 ```
 
-Forty-one low-collision global explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
+Forty-two low-collision global explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
 
 ## 0.8.0 default behavior
 
