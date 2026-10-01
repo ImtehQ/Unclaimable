@@ -2,19 +2,19 @@
 
 ASP.NET Core dependency-injection and DataAnnotations integration for Unclaimable.
 
-**Package version: 0.8.0**
+**Package version: 0.8.1**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable.AspNetCore --version 0.8.0
+dotnet add package Unclaimable.AspNetCore --version 0.8.1
 ```
 
 The required `Unclaimable` core dependency is installed transitively.
 
 ## Framework support
 
-`Unclaimable.AspNetCore` 0.8.0 ships framework-specific assets for `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0`, and `net11.0`. NuGet selects the matching asset for the consuming application automatically.
+`Unclaimable.AspNetCore` 0.8.1 ships framework-specific assets for `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0`, and `net11.0`. NuGet selects the matching asset for the consuming application automatically.
 
 The compatibility suite compiles and runs the DI and DataAnnotations integration on every advertised target. `net11.0` support is tested against the current .NET 11 prerelease SDK until .NET 11 reaches general availability.
 
@@ -28,7 +28,7 @@ builder.Services.AddUnclaimable();
 
 This registers the configured `Options`, a live singleton `IPolicy`, and an `IChecker`.
 
-With no configuration callback, the registered checker uses the same 0.8.0 defaults as a normal `new Checker()`: all built-in protected identity rules are enabled except `Rule.Numbers`, the standard pattern defaults apply, and the same deny-first behavior is preserved.
+With no configuration callback, the registered checker uses the same 0.8.1 defaults as a normal `new Checker()`: all built-in protected identity rules are enabled except `Rule.Numbers`, the standard pattern defaults apply, and the same deny-first behavior is preserved.
 
 Configure the checker during registration:
 
@@ -90,7 +90,7 @@ Application-wide and reason-specific validation messages can also be configured 
 
 ## Startup allowances and scoped exceptions
 
-Keep the 0.8.0 defaults enabled and express application conventions narrowly:
+Keep the 0.8.1 defaults enabled and express application conventions narrowly:
 
 ```csharp
 builder.Services.AddUnclaimable(options =>
