@@ -20,7 +20,7 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds global multilingual explicit/anatomical profanity reservations. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds global multilingual explicit, sexual, and anatomical profanity reservations. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
 
 ### Add an application-specific reserved name
 
@@ -231,7 +231,7 @@ Prefer the narrowest API that expresses the application's actual rule.
 
 ## 0.8.1 multilingual profanity behavior
 
-`Category.Profanity` and `Rule.Profanity` remain enabled by default. 0.8.1 adds a global high-confidence multilingual explicit/anatomical dataset that is always loaded, regardless of `Options.Languages`.
+`Category.Profanity` and `Rule.Profanity` remain enabled by default. 0.8.1 adds a global high-confidence multilingual explicit, sexual, and anatomical dataset that is always loaded, regardless of `Options.Languages`.
 
 That prevents a user from bypassing this protection by switching languages. The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
 
@@ -242,6 +242,7 @@ boobs     -> Profanity
 b00bs     -> Profanity / Obfuscated
 vagina    -> Profanity
 v4g1n4    -> Profanity / Obfuscated
+myp3n1sname -> Profanity / Partial (after obfuscation)
 ```
 
 General localized profanity remains language-scoped. For example, Dutch-only profanity still requires `Language.Dutch`; 0.8.1 does not make every localized insult or slang term global.
@@ -258,7 +259,7 @@ Or disable profanity matching through the rule:
 options.DisableRule(Rule.Profanity);
 ```
 
-`ProfanityPartialMatching` remains opt-in. The global entries therefore do not become generic substring roots unless the application explicitly enables that behavior.
+Forty-one low-collision global explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
 
 ## 0.8.0 default behavior
 
