@@ -89,13 +89,13 @@ The repository contains three companion packages that share the same release ver
 
 ### Unclaimable.AspNetCore
 
-Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.0 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core default rules unless the application configures them differently.
+Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.1 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including the global multilingual profanity reservations, unless the application configures them differently.
 
 See [the ASP.NET Core package README](platforms/dotnet/src/Unclaimable.AspNetCore/README.NUGET.md).
 
 ### Unclaimable.Email
 
-Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.0 identity defaults, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
+Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.1 defaults, including the global multilingual profanity reservations, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
 
 See [the Email package README](platforms/dotnet/src/Unclaimable.Email/README.NUGET.md).
 
@@ -187,7 +187,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 ## Features
 
 - Reserved-name protection across **23 built-in categories**
-- **11,150 filter entries** representing **11,039 unique values**
+- **11,217 filter entries** representing **11,096 unique values**
 - Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
 - Global multilingual explicit/anatomical profanity reservations under `Category.Profanity`
@@ -213,7 +213,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 
 ### Application ecosystem compatibility
 
-The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.0 compatibility workflow compile-checks consumers for:
+The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.1 compatibility workflow compile-checks consumers for:
 
 - .NET MAUI (Android);
 - Blazor WebAssembly;
