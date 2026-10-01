@@ -2,12 +2,12 @@
 
 Fast, dependency-free reserved username and identifier validation for .NET.
 
-**Package version: 0.8.0**
+**Package version: 0.8.1**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable --version 0.8.0
+dotnet add package Unclaimable --version 0.8.1
 ```
 
 ## Quick start
@@ -31,6 +31,12 @@ if (result.IsClaimable)
 The Core package targets `netstandard2.0` and is intended for portable application code. The 0.8.0 compatibility workflow compile-checks it in .NET MAUI, Blazor WebAssembly, WPF, Windows Forms, Console, Worker Service, Avalonia, and Uno Platform consumers.
 
 No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for the Core checker; NuGet resolves the portable asset automatically.
+
+## Multilingual profanity hardening in 0.8.1
+
+`Category.Profanity` remains enabled by default. 0.8.1 adds a global multilingual set of high-confidence explicit and anatomical terms that is loaded regardless of `Options.Languages`. Those entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline, so variants such as `p3n1s`, `b00bs`, and `v4g1n4` are covered by the existing matcher.
+
+General localized profanity still follows the enabled language packs. Disable the global and localized profanity category with `options.DisableCategory(Category.Profanity)`, or disable profanity matching through `Rule.Profanity`. Generic profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 
 ## Strict defaults in 0.8.0
 
@@ -101,6 +107,7 @@ The default policy combines:
 
 - 23 built-in reserved-name categories;
 - English reserved-name data by default, with additional localized datasets available;
+- global multilingual explicit/anatomical profanity reservations under `Category.Profanity`;
 - exact and compact matching;
 - curated partial matching;
 - obfuscation/leetspeak matching;
@@ -208,7 +215,7 @@ options.Reserve("Example Identity", "partner", ReservedMatchMode.WholeIdentifier
 
 ## Languages
 
-English is enabled by default. Additional localized datasets can be added explicitly:
+English is enabled by default. Additional localized datasets can be added explicitly. The global high-confidence explicit/anatomical profanity dataset is always included and is not controlled by `Options.Languages`:
 
 ```csharp
 options.AddLanguage(Language.Dutch);
