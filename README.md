@@ -28,7 +28,7 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 The new global entries participate in the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. For example, forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
 
-General localized profanity is still controlled by `Options.Languages`; the release does **not** make every localized insult or slang term global. Forty-one low-collision global terms are curated partial roots, so wrappers such as `myp3n1sname` are blocked while collision-prone forms remain exact-only. Applications can still disable the protection explicitly with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Broad non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
+General localized profanity is still controlled by `Options.Languages`; the release does **not** make every localized insult or slang term global. Forty-two low-collision global terms are curated partial roots, so wrappers such as `myp3n1sname` are blocked while collision-prone forms remain exact-only. Applications can still disable the protection explicitly with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Broad non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 
 ## 0.8.0: stricter defaults with narrow exceptions
 
