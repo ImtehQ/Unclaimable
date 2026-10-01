@@ -44,7 +44,7 @@ public sealed class Profanity081Tests
     }
 
     [Fact]
-    public void RemovingLanguagesDoesNotDisableProfanity()
+    public void RemovingLanguagesDoesNotDisableGlobalExplicitProfanity()
     {
         var options = new Options();
         foreach (var language in Enum.GetValues<Language>())
@@ -58,6 +58,18 @@ public sealed class Profanity081Tests
         Assert.Equal("profanity", checker.Check("piemel").Category);
         Assert.Equal("profanity", checker.Check("pimmel").Category);
         Assert.Equal("profanity", checker.Check("pene").Category);
+    }
+
+    [Fact]
+    public void GeneralLocalizedProfanityStillRespectsLanguageSelection()
+    {
+        var defaultChecker = new Checker(new Options());
+        Assert.True(defaultChecker.IsClaimable("godverdomme"));
+
+        var dutch = new Options();
+        dutch.AddLanguage(Language.Dutch);
+
+        Assert.Equal("profanity", new Checker(dutch).Check("godverdomme").Category);
     }
 
     [Fact]
