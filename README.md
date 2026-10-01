@@ -18,9 +18,17 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## Current release: 0.8.0
+## Current release: 0.8.1
 
-0.8.0 establishes the default policy we intend to keep stable going forward: deny-first validation, default-on protected identity rules, clearer repeated-pattern behavior, and narrow exceptions that let applications relax one check without disabling an entire protection.
+0.8.1 hardens the existing default-on profanity protection with a global multilingual explicit/anatomical corpus while preserving the existing language-pack behavior for general localized profanity.
+
+## 0.8.1: multilingual profanity hardening
+
+`Category.Profanity` already existed and remains enabled by default. 0.8.1 adds a language-independent dataset for high-confidence explicit and anatomical terms so a user cannot bypass this protection just by switching languages.
+
+The new global entries participate in the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. For example, forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
+
+General localized profanity is still controlled by `Options.Languages`; the release does **not** make every localized insult or slang term global. Applications can still disable the protection explicitly with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Generic profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 
 ## 0.8.0: stricter defaults with narrow exceptions
 
@@ -182,6 +190,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 - **11,150 filter entries** representing **11,039 unique values**
 - Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
+- Global multilingual explicit/anatomical profanity reservations under `Category.Profanity`
 - Per-category enable/disable controls
 - Exact built-in exceptions, scoped rule/pattern allowances, and application-specific reservations
 - Configurable numeric-only, repeated, symbol-only, ASCII-art, and uppercase-only pattern checks
@@ -220,10 +229,10 @@ Those application models use the same portable packages; there is no separate MA
 Install the current release:
 
 ```bash
-dotnet add package Unclaimable --version 0.8.0
-dotnet add package Unclaimable.AspNetCore --version 0.8.0
-dotnet add package Unclaimable.Email --version 0.8.0
-dotnet add package Unclaimable.Extended --version 0.8.0
+dotnet add package Unclaimable --version 0.8.1
+dotnet add package Unclaimable.AspNetCore --version 0.8.1
+dotnet add package Unclaimable.Email --version 0.8.1
+dotnet add package Unclaimable.Extended --version 0.8.1
 ```
 
 ## Quick start
