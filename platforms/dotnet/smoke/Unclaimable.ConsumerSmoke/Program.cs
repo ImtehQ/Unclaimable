@@ -28,6 +28,8 @@ Require(checker.Check(new string('a', 33)).MatchKind == MatchKind.TooLong, "Maxi
 Require(checker.Check("fuckwaffle").Category == "profanity", "Curated English profanity compounds should participate by default.");
 Require(checker.Check("penis").Category == "profanity", "Global explicit profanity should be reserved by default.");
 Require(checker.Check("p3n1s").MatchKind == MatchKind.Obfuscated, "Global explicit profanity should use the existing leetspeak pipeline.");
+Require(checker.Check("myp3n1sname").MatchKind == MatchKind.Partial, "Curated explicit profanity should reject wrapped leetspeak forms.");
+Require(checker.IsClaimable("cocktail"), "Collision-prone explicit terms should remain exact-only by default.");
 Require(checker.Check("piemel").Category == "profanity", "Global multilingual explicit profanity should not require the Dutch language pack.");
 Require(checker.IsClaimable("godverdomme"), "General Dutch profanity should remain language-scoped until Dutch is added.");
 Require(checker.IsClaimable("facturatiehulp"), "Dutch localized support data should not load until Dutch is added.");
