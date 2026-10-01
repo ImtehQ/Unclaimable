@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "category": "profanity",
-  "description": "Common English profanity, vulgar insults, and explicit/anatomical sexual terms. Intentionally excludes identity-targeting slurs.",
+  "description": "Common English profanity and vulgar insults. Intentionally excludes identity-targeting slurs.",
   "values": [
     "arse",
     "ass",
@@ -75,22 +75,7 @@
     "wankers",
     "wanking",
     "whore",
-    "whores",
-    "penis",
-    "penises",
-    "vagina",
-    "vaginas",
-    "vulva",
-    "vulvas",
-    "anus",
-    "anuses",
-    "boob",
-    "boobs",
-    "tit",
-    "tits",
-    "titties",
-    "breast",
-    "breasts"
+    "whores"
   ],
   "partialValues": [
     "arseface",
