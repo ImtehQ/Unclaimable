@@ -2,18 +2,19 @@
 
 ## 0.8.1 - 2026-10-01
 
-> **Default-behavior note:** 0.8.1 expands the existing default-on profanity protection with a language-independent multilingual explicit/anatomical corpus. Applications that intentionally allow these identifiers should regression-test their real username corpus before upgrading.
+> **Default-behavior note:** 0.8.1 expands the existing default-on profanity protection with a language-independent multilingual explicit, sexual, and anatomical corpus. Applications that intentionally allow these identifiers should regression-test their real username corpus before upgrading.
 
 ### Added
 
-- A global `Category.Profanity` dataset for high-confidence explicit and anatomical sexual terms across all 15 supported language families. These entries are always available and are not controlled by `Options.Languages`, preventing a user from bypassing this protection simply by switching languages.
+- A global `Category.Profanity` dataset for high-confidence explicit, sexual, and anatomical terms across all 15 supported language families. These entries are always available and are not controlled by `Options.Languages`, preventing a user from bypassing this protection simply by switching languages.
 - Coverage for English terms such as `boob`, `boobs`, `penis`, `vagina`, and `vulva`, plus high-confidence equivalents and common forms from Dutch, German, French, Spanish, Italian, Portuguese, Polish, Turkish, Indonesian, Czech, Vietnamese, Hungarian, Swedish, and Romanian.
-- Regression coverage proving the new entries use the existing exact, compact, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts`.
-- Core dataset coverage increases from **11,150** to **11,217 filter entries** and from **11,039** to **11,096 category-unique values**. The category count remains **23**.
+- Regression coverage proving the new entries use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myp3n1sname`.
+- Forty-one low-collision explicit terms are curated partial roots so simple prefix/suffix wrapping does not bypass protection. Collision-prone short forms remain exact-only; examples such as `cocktail`, `penelope`, `janus`, and `dickens` remain claimable by this dataset.
+- Core dataset coverage increases from **11,150** to **11,324 filter entries** and from **11,039** to **11,108 category-unique values**. The category count remains **23**.
 
 ### Changed
 
-- General localized profanity remains scoped to enabled language packs. Only the new high-confidence explicit/anatomical corpus is global, avoiding a broad change that would make every localized insult or slang term active in every application.
+- General localized profanity remains scoped to enabled language packs. Only the new high-confidence explicit, sexual, and anatomical corpus is global, avoiding a broad change that would make every localized insult or slang term active in every application.
 - `Category.Profanity` and `Rule.Profanity` remain the explicit opt-outs. `ProfanityPartialMatching` remains opt-in, so the new global terms do not automatically become arbitrary substring rules.
 - No new public enum values or configuration APIs are introduced in 0.8.1.
 
