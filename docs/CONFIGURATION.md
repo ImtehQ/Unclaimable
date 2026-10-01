@@ -1,4 +1,4 @@
-# Configuring Unclaimable 0.8.0
+# Configuring Unclaimable 0.8.1
 
 This guide explains how to keep Unclaimable's strict defaults while making small, intentional exceptions for an application's naming rules.
 
@@ -20,7 +20,7 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.0 default is intentionally strict. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds global multilingual explicit/anatomical profanity reservations. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
 
 ### Add an application-specific reserved name
 
@@ -228,6 +228,37 @@ The uppercase-only pattern is skipped, but `ADMIN` still resolves to the reserve
 | Allow one Extended identity | `ExtendedOptions.AllowedIdentifiers` | one Extended registration |
 
 Prefer the narrowest API that expresses the application's actual rule.
+
+## 0.8.1 multilingual profanity behavior
+
+`Category.Profanity` and `Rule.Profanity` remain enabled by default. 0.8.1 adds a global high-confidence multilingual explicit/anatomical dataset that is always loaded, regardless of `Options.Languages`.
+
+That prevents a user from bypassing this protection by switching languages. The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
+
+```text
+penis     -> Profanity
+p3n1s     -> Profanity / Obfuscated
+boobs     -> Profanity
+b00bs     -> Profanity / Obfuscated
+vagina    -> Profanity
+v4g1n4    -> Profanity / Obfuscated
+```
+
+General localized profanity remains language-scoped. For example, Dutch-only profanity still requires `Language.Dutch`; 0.8.1 does not make every localized insult or slang term global.
+
+Disable the entire profanity category when an application intentionally permits these identifiers:
+
+```csharp
+options.DisableCategory(Category.Profanity);
+```
+
+Or disable profanity matching through the rule:
+
+```csharp
+options.DisableRule(Rule.Profanity);
+```
+
+`ProfanityPartialMatching` remains opt-in. The global entries therefore do not become generic substring roots unless the application explicitly enables that behavior.
 
 ## 0.8.0 default behavior
 
