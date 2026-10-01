@@ -20,11 +20,11 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 ## Current release: 0.8.1
 
-0.8.1 hardens the existing default-on profanity protection with a global multilingual explicit/anatomical corpus while preserving the existing language-pack behavior for general localized profanity.
+0.8.1 hardens the existing default-on profanity protection with a global multilingual explicit, sexual, and anatomical corpus while preserving the existing language-pack behavior for general localized profanity.
 
 ## 0.8.1: multilingual profanity hardening
 
-`Category.Profanity` already existed and remains enabled by default. 0.8.1 adds a language-independent dataset for high-confidence explicit and anatomical terms so a user cannot bypass this protection just by switching languages.
+`Category.Profanity` already existed and remains enabled by default. 0.8.1 adds a language-independent dataset for high-confidence explicit, sexual, and anatomical terms so a user cannot bypass this protection just by switching languages.
 
 The new global entries participate in the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. For example, forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
 
@@ -81,7 +81,7 @@ abcabc   -> rejected: repeated span reaches 6
 
 All built-in rules are enabled by default except `Rule.Numbers`; this includes the protected country, city, celebrity, and other identity rules. Mixed alphanumeric names remain possible, while `Pattern.NumericOnly` continues to reject all-numeric identifiers. `Pattern.UppercaseOnly` remains opt-in.
 
-For copy-paste recipes, precedence, migration guidance, ASP.NET Core setup, Email local-part customization, and Extended-data exceptions, see the **[0.8.0 configuration and exceptions guide](docs/CONFIGURATION.md)**.
+For copy-paste recipes, precedence, migration guidance, ASP.NET Core setup, Email local-part customization, and Extended-data exceptions, see the **[configuration and exceptions guide](docs/CONFIGURATION.md)**.
 
 ## Companion packages
 
@@ -187,10 +187,10 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 ## Features
 
 - Reserved-name protection across **23 built-in categories**
-- **11,217 filter entries** representing **11,096 unique values**
+- **11,324 filter entries** representing **11,108 unique values**
 - Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
-- Global multilingual explicit/anatomical profanity reservations under `Category.Profanity`
+- Global multilingual explicit, sexual, and anatomical profanity reservations under `Category.Profanity`
 - Per-category enable/disable controls
 - Exact built-in exceptions, scoped rule/pattern allowances, and application-specific reservations
 - Configurable numeric-only, repeated, symbol-only, ASCII-art, and uppercase-only pattern checks
