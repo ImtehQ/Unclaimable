@@ -7,7 +7,7 @@ Current global categories:
 
 - `brands` — companies, products, consumer brands and other impersonation-sensitive names;
 - `technology` — technology companies, platforms, products and ecosystems;
-- `profanity` — high-confidence multilingual explicit and anatomical sexual terms that should remain reserved regardless of enabled localized language packs;
+- `profanity` — high-confidence multilingual explicit, sexual, and anatomical terms that should remain reserved regardless of enabled localized language packs;
 - `security` — cybersecurity, incident-response, vulnerability and security-research identities;
 - `automation` — automated service identities, runners, bots, workflow and orchestration names;
 - `legal` — legal, privacy, intellectual-property and regulatory-response identities;
@@ -16,6 +16,6 @@ Current global categories:
 - `placeholders` — null-like, unset, missing and placeholder identifiers that should not be claimed as user identities;
 - `other` — protected platform-facing names that do not fit cleanly into another category.
 
-Each dataset uses schema version `1` and declares `"language": "global"` explicitly.
+Global datasets declare `"language": "global"` explicitly. They may use schema version `1` for exact values or schema version `2` when curated partial values or generated combinations are needed.
 
 When adding values, prefer a specific category over `other`, avoid duplicates across existing localized datasets unless a value is intentionally promoted to global scope to prevent a language-pack bypass, and keep ordinary personal names claimable whenever possible.
