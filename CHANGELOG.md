@@ -8,8 +8,8 @@
 
 - A global `Category.Profanity` dataset for high-confidence explicit, sexual, and anatomical terms across all 15 supported language families. These entries are always available and are not controlled by `Options.Languages`, preventing a user from bypassing this protection simply by switching languages.
 - Coverage for English terms such as `boob`, `boobs`, `penis`, `vagina`, and `vulva`, plus high-confidence equivalents and common forms from Dutch, German, French, Spanish, Italian, Portuguese, Polish, Turkish, Indonesian, Czech, Vietnamese, Hungarian, Swedish, and Romanian.
-- Regression coverage proving the new entries use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myp3n1sname`.
-- Forty-one low-collision explicit terms are curated partial roots so simple prefix/suffix wrapping does not bypass protection. Collision-prone short forms remain exact-only; examples such as `cocktail`, `penelope`, `janus`, and `dickens` remain claimable by this dataset.
+- Regression coverage proving the new entries use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myb00bname` and `myp3n1sname`.
+- Forty-two low-collision explicit terms are curated partial roots so simple prefix/suffix wrapping does not bypass protection. Collision-prone short forms remain exact-only; examples such as `cocktail`, `penelope`, `janus`, and `dickens` remain claimable by this dataset.
 - Core dataset coverage increases from **11,150** to **11,324 filter entries** and from **11,039** to **11,108 category-unique values**. The category count remains **23**.
 
 ### Changed
