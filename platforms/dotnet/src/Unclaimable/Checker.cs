@@ -227,12 +227,18 @@ public sealed partial class Checker : IChecker
                 continue;
             }
 
-            if (entry.Language.HasValue && !options.Languages.Contains(entry.Language.Value))
+            var isProfanity = string.Equals(entry.Category, "profanity", StringComparison.Ordinal);
+
+            // Profanity is intentionally language-independent. Usernames should not be able to
+            // bypass the default profanity reservation policy simply by switching languages.
+            // Other localized categories remain scoped to Options.Languages.
+            if (!isProfanity
+                && entry.Language.HasValue
+                && !options.Languages.Contains(entry.Language.Value))
             {
                 continue;
             }
 
-            var isProfanity = string.Equals(entry.Category, "profanity", StringComparison.Ordinal);
             if (isProfanity && !profanityMatching)
             {
                 continue;
