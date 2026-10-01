@@ -27,7 +27,7 @@ public sealed class AdditionalLanguageTests
         yield return new object[] { Language.Vietnamese, "vi", "dịch vụ khách hàng", "thằng khốn" };
         yield return new object[] { Language.Hungarian, "hu", "ügyfélszolgálat", "rohadék" };
         yield return new object[] { Language.Swedish, "sv", "kundtjänst", "skitstövel" };
-        yield return new object[] { Language.Romanian, "ro", "serviciul clienți", "sugi pula" };
+        yield return new object[] { Language.Romanian, "ro", "serviciul clienți", "căcat" };
     }
 
     /// <summary>Verifies that every embedded concrete value loads under its own language and category.</summary>
