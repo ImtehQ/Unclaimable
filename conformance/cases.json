@@ -148,5 +148,15 @@
     "value": "vagína",
     "reserved": true,
     "category": "profanity"
+  },
+  {
+    "value": "myp3n1sname",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "cocktail",
+    "reserved": false,
+    "category": null
   }
 ]
