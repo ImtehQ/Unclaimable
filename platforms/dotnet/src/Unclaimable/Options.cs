@@ -39,7 +39,8 @@ public sealed partial class Options
     /// Localized built-in datasets currently enabled for this checker. English is enabled by default.
     /// Use <see cref="AddLanguage"/> and <see cref="RemoveLanguage"/> to change the enabled set.
     /// Removing language-pack folders from a source checkout is also supported; missing packs simply
-    /// contribute no embedded entries. Global datasets such as brands and technology are always included.
+    /// contribute no embedded entries. Global datasets such as brands, technology, and the high-confidence
+    /// multilingual profanity reservations are always included.
     /// </summary>
     public IReadOnlyCollection<Language> Languages => _languages;
 
@@ -103,7 +104,8 @@ public sealed partial class Options
     public int PartialMatchMinimumLength { get; set; } = 4;
 
     /// <summary>
-    /// Include profanity from the enabled localized dataset or datasets. Enabled by default.
+    /// Includes the global multilingual profanity reservations plus profanity from enabled localized datasets.
+    /// Enabled by default. Global profanity entries are not controlled by <see cref="Languages"/>.
     /// Kept for compatibility; prefer disabling <see cref="Rule.Profanity"/>.
     /// </summary>
     public bool ProfanityMatching { get; set; } = true;
