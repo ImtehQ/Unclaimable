@@ -43,6 +43,31 @@ public sealed class Profanity081Tests
         Assert.Equal(MatchKind.Obfuscated, result.MatchKind);
     }
 
+    [Theory]
+    [InlineData("xxpenisxx", "penis")]
+    [InlineData("myp3n1sname", "penis")]
+    [InlineData("xxv4g1n4xx", "vagina")]
+    [InlineData("mypiemelname", "piemel")]
+    public void CuratedExplicitTermsBlockWrappedAndObfuscatedWrappedForms(string value, string expected)
+    {
+        var result = new Checker(new Options()).Check(value);
+
+        Assert.True(result.IsReserved, value);
+        Assert.Equal("profanity", result.Category);
+        Assert.Equal(expected, result.MatchedValue);
+        Assert.Equal(MatchKind.Partial, result.MatchKind);
+    }
+
+    [Theory]
+    [InlineData("cocktail")]
+    [InlineData("penelope")]
+    [InlineData("janus")]
+    [InlineData("dickens")]
+    public void CollisionProneExplicitTermsRemainExactOnlyByDefault(string value)
+    {
+        Assert.True(new Checker(new Options()).IsClaimable(value), value);
+    }
+
     [Fact]
     public void RemovingLanguagesDoesNotDisableGlobalExplicitProfanity()
     {
@@ -70,6 +95,17 @@ public sealed class Profanity081Tests
         dutch.AddLanguage(Language.Dutch);
 
         Assert.Equal("profanity", new Checker(dutch).Check("godverdomme").Category);
+    }
+
+    [Fact]
+    public void CompatibilityProfanityToggleStillDisablesGlobalExplicitProfanity()
+    {
+        var options = new Options
+        {
+            ProfanityMatching = false
+        };
+
+        Assert.True(new Checker(options).IsClaimable("penis"));
     }
 
     [Fact]
