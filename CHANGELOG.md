@@ -17,6 +17,7 @@
 - General localized profanity remains scoped to enabled language packs. Only the new high-confidence explicit, sexual, and anatomical corpus is global, avoiding a broad change that would make every localized insult or slang term active in every application.
 - `Category.Profanity` and `Rule.Profanity` remain the explicit opt-outs. `ProfanityPartialMatching` remains opt-in, so the new global terms do not automatically become arbitrary substring rules.
 - No new public enum values or configuration APIs are introduced in 0.8.1.
+- NuGet package-validation baselines move from 0.7.8 to the published 0.8.0 packages for all four first-party packages.
 
 ## 0.8.0 - 2026-09-21
 
