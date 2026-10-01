@@ -36,7 +36,7 @@ No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for th
 
 `Category.Profanity` remains enabled by default. 0.8.1 adds a global multilingual set of high-confidence explicit, sexual, and anatomical terms that is loaded regardless of `Options.Languages`. Those entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline, so variants such as `p3n1s`, `b00bs`, and `v4g1n4` are covered by the existing matcher.
 
-General localized profanity still follows the enabled language packs. Forty-one low-collision global explicit terms are curated partial roots, so wrapping or leetspeak-wrapping them inside a larger identifier does not bypass protection. Collision-prone forms remain exact-only by default. Disable the global and localized profanity category with `options.DisableCategory(Category.Profanity)`, or disable profanity matching through `Rule.Profanity`. Broad, non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
+General localized profanity still follows the enabled language packs. Forty-two low-collision global explicit terms are curated partial roots, so wrapping or leetspeak-wrapping them inside a larger identifier does not bypass protection. Collision-prone forms remain exact-only by default. Disable the global and localized profanity category with `options.DisableCategory(Category.Profanity)`, or disable profanity matching through `Rule.Profanity`. Broad, non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 
 ## Strict defaults in 0.8.0
 
