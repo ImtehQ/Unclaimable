@@ -64,8 +64,7 @@ public sealed partial class Checker
             }
 
             if (_obfuscationSensitivity >= ObfuscationSensitivity.Medium
-                && (character == 'q'
-                    || character == '€'
+                && (character == '€'
                     || character == '¢'
                     || character == '§'
                     || character == '¥'))
