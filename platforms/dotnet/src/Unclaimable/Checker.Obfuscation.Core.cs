@@ -42,7 +42,7 @@ public sealed partial class Checker
             && TryMatchObfuscationEditTransitions(
                 source, sourceIndex, target, targetIndex,
                 preserveNonCompactCharacters, maxEdits, editsUsed,
-                requireSourceEnd, failed, out endIndex))
+                transformed, requireSourceEnd, failed, out endIndex))
         {
             return true;
         }
