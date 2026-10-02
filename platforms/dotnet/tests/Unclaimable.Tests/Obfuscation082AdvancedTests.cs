@@ -28,6 +28,7 @@ public sealed class Obfuscation082AdvancedTests
             ObfuscationSensitivity = ObfuscationSensitivity.Extreme
         };
         options.DisableRule(Rule.BlockedCharacters);
+        options.DisablePattern(Pattern.AsciiArt);
         options.Reserve("bex", ReservedMatchMode.WholeIdentifier);
 
         var result = new Checker(options).Check("|3e><");
