@@ -7,7 +7,6 @@ Current global categories:
 
 - `brands` — companies, products, consumer brands and other impersonation-sensitive names;
 - `technology` — technology companies, platforms, products and ecosystems;
-- `profanity` — high-confidence multilingual explicit, sexual, and anatomical terms that should remain reserved regardless of enabled localized language packs;
 - `security` — cybersecurity, incident-response, vulnerability and security-research identities;
 - `automation` — automated service identities, runners, bots, workflow and orchestration names;
 - `legal` — legal, privacy, intellectual-property and regulatory-response identities;
@@ -18,4 +17,4 @@ Current global categories:
 
 Global datasets declare `"language": "global"` explicitly. They may use schema version `1` for exact values or schema version `2` when curated partial values or generated combinations are needed.
 
-When adding values, prefer a specific category over `other`, avoid duplicates across existing localized datasets unless a value is intentionally promoted to global scope to prevent a language-pack bypass, and keep ordinary personal names claimable whenever possible.
+When adding values, prefer a specific category over `other`, avoid duplicates across existing localized datasets, and keep ordinary personal names claimable whenever possible. Profanity remains language-scoped data; cross-language profanity behavior is controlled by `Options.MultilingualProfanityMatching`.

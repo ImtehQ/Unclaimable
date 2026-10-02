@@ -26,16 +26,22 @@ Require(checker.Check("ordinary user").MatchKind == MatchKind.BlockedCharacter, 
 Require(checker.Check("ab").MatchKind == MatchKind.TooShort, "Minimum length should be enforced by default.");
 Require(checker.Check(new string('a', 33)).MatchKind == MatchKind.TooLong, "Maximum length should be enforced by default.");
 Require(checker.Check("fuckwaffle").Category == "profanity", "Curated English profanity compounds should participate by default.");
-Require(checker.Check("penis").Category == "profanity", "Global explicit profanity should be reserved by default.");
-Require(checker.Check("p3n1s").MatchKind == MatchKind.Obfuscated, "Global explicit profanity should use the existing leetspeak pipeline.");
+Require(checker.Check("penis").Category == "profanity", "English explicit profanity should be reserved by default.");
+Require(checker.Check("p3n1s").MatchKind == MatchKind.Obfuscated, "Explicit profanity should use the existing leetspeak pipeline.");
 Require(checker.Check("myp3n1sname").MatchKind == MatchKind.Partial, "Curated explicit profanity should reject wrapped leetspeak forms.");
 Require(checker.IsClaimable("cocktail"), "Collision-prone explicit terms should remain exact-only by default.");
-Require(checker.Check("piemel").Category == "profanity", "Global multilingual explicit profanity should not require the Dutch language pack.");
-Require(checker.IsClaimable("godverdomme"), "General Dutch profanity should remain language-scoped until Dutch is added.");
+Require(checker.Check("piemel").Category == "profanity", "Default multilingual profanity matching should include Dutch profanity.");
+Require(checker.Check("godverdomme").Category == "profanity", "Default multilingual profanity matching should include the full Dutch profanity filter.");
+
+var englishScopedProfanityOptions = new Options { MultilingualProfanityMatching = false };
+var englishScopedProfanityChecker = new Checker(englishScopedProfanityOptions);
+Require(englishScopedProfanityChecker.Check("penis").Category == "profanity", "English profanity should remain active when multilingual profanity is disabled.");
+Require(englishScopedProfanityChecker.IsClaimable("piemel"), "Dutch profanity should stay inactive when multilingual profanity is disabled and Dutch is not selected.");
+Require(englishScopedProfanityChecker.IsClaimable("godverdomme"), "General Dutch profanity should stay inactive when multilingual profanity is disabled and Dutch is not selected.");
 Require(checker.IsClaimable("facturatiehulp"), "Dutch localized support data should not load until Dutch is added.");
 Require(checker.IsClaimable("abrechnungshilfe"), "German localized support data should not load until German is added.");
 
-var englishAndDutchOptions = new Options();
+var englishAndDutchOptions = new Options { MultilingualProfanityMatching = false };
 englishAndDutchOptions.AddLanguage(Language.Dutch);
 var englishAndDutchChecker = new Checker(englishAndDutchOptions);
 Require(englishAndDutchChecker.Check("customersupport").Category == "support", "Adding Dutch should keep English enabled.");
@@ -43,7 +49,7 @@ Require(englishAndDutchChecker.Check("facturatiehulp").Category == "support", "D
 Require(englishAndDutchChecker.Check("systeembeheerder").Category == "roles", "Dutch role data should be embedded in the package.");
 Require(englishAndDutchChecker.Check("godverdomme").Category == "profanity", "Dutch profanity data should be embedded in the package.");
 
-var dutchOnlyOptions = new Options();
+var dutchOnlyOptions = new Options { MultilingualProfanityMatching = false };
 dutchOnlyOptions.RemoveLanguage(Language.English);
 dutchOnlyOptions.AddLanguage(Language.Dutch);
 var dutchOnlyChecker = new Checker(dutchOnlyOptions);

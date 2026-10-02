@@ -20,16 +20,17 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 ## Current release: 0.8.1
 
-0.8.1 hardens the existing default-on profanity protection with a global multilingual explicit, sexual, and anatomical corpus while preserving the existing language-pack behavior for general localized profanity.
+0.8.1 extends the normal localized profanity filters and adds default-on multilingual profanity matching so changing languages cannot be used as a profanity bypass.
 
 ## 0.8.1: multilingual profanity hardening
 
-`Category.Profanity` already existed and remains enabled by default. 0.8.1 adds a language-independent dataset for high-confidence explicit, sexual, and anatomical terms so a user cannot bypass this protection just by switching languages.
+`Category.Profanity` already existed and remains enabled by default. The 174 expanded explicit, sexual, and anatomical terms now live in their appropriate language profanity datasets rather than in a separate global dataset.
 
-The new global entries participate in the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. For example, forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
+`Options.MultilingualProfanityMatching` is enabled by default. With it enabled, profanity from all supported language packs participates even if `Options.Languages` contains only English. Set it to `false` when profanity should follow only the selected language packs. For example, English profanity continues to work with English selected while Dutch profanity remains inactive until Dutch is added.
 
-General localized profanity is still controlled by `Options.Languages`; the release does **not** make every localized insult or slang term global. Forty-two low-collision global terms are curated partial roots, so wrappers such as `myp3n1sname` are blocked while collision-prone forms remain exact-only. Applications can still disable the protection explicitly with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Broad non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
+The expanded entries use the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. Forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
 
+Forty-two low-collision expanded terms are curated partial roots, so wrappers such as `myp3n1sname` are blocked while collision-prone forms remain exact-only. Applications can still disable profanity entirely with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Broad non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 ## 0.8.0: stricter defaults with narrow exceptions
 
 The important behavioral change is that Unclaimable now leans consistently into deny-first validation. Protected identity rules are enabled by default, selected high-trust roots such as `admin`, `staff`, `root`, `owner`, `support`, and `help` can reject containing identifiers, and repeated-pattern defaults are more explicit.
@@ -89,13 +90,13 @@ The repository contains three companion packages that share the same release ver
 
 ### Unclaimable.AspNetCore
 
-Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.1 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including the global multilingual profanity reservations, unless the application configures them differently.
+Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.1 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
 
 See [the ASP.NET Core package README](platforms/dotnet/src/Unclaimable.AspNetCore/README.NUGET.md).
 
 ### Unclaimable.Email
 
-Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.1 defaults, including the global multilingual profanity reservations, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
+Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.1 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
 
 See [the Email package README](platforms/dotnet/src/Unclaimable.Email/README.NUGET.md).
 

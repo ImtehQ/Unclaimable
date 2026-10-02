@@ -20,7 +20,7 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds global multilingual explicit, sexual, and anatomical profanity reservations. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds default-on multilingual profanity matching across the localized profanity datasets. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
 
 ### Add an application-specific reserved name
 
@@ -231,21 +231,48 @@ Prefer the narrowest API that expresses the application's actual rule.
 
 ## 0.8.1 multilingual profanity behavior
 
-`Category.Profanity` and `Rule.Profanity` remain enabled by default. 0.8.1 adds a global high-confidence multilingual explicit, sexual, and anatomical dataset that is always loaded, regardless of `Options.Languages`.
+`Category.Profanity` and `Rule.Profanity` remain enabled by default. The expanded explicit, sexual, and anatomical terms are stored in their normal per-language profanity datasets.
 
-That prevents a user from bypassing this protection by switching languages. The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
+`MultilingualProfanityMatching` is enabled by default. This causes profanity datasets from all supported languages to participate even when those languages are not selected in `Options.Languages`:
 
-```text
-penis     -> Profanity
-p3n1s     -> Profanity / Obfuscated
-boobs     -> Profanity
-b00bs     -> Profanity / Obfuscated
-vagina    -> Profanity
-v4g1n4    -> Profanity / Obfuscated
-myp3n1sname -> Profanity / Partial (after obfuscation)
+```csharp
+var options = new Options(); // English selected; multilingual profanity enabled by default.
+var checker = new Checker(options);
+
+// English profanity.
+checker.Check("penis");
+
+// Dutch profanity is also protected by multilingual mode.
+checker.Check("piemel");
+checker.Check("godverdomme");
 ```
 
-General localized profanity remains language-scoped. For example, Dutch-only profanity still requires `Language.Dutch`; 0.8.1 does not make every localized insult or slang term global.
+To make profanity follow only the selected language packs, disable multilingual profanity matching:
+
+```csharp
+var options = new Options
+{
+    MultilingualProfanityMatching = false
+};
+
+// English is selected by default, so English profanity still applies.
+// Dutch profanity is not loaded yet.
+options.AddLanguage(Language.Dutch); // Now Dutch profanity applies too.
+```
+
+This switch affects only profanity language selection. Other localized categories still follow `Options.Languages` normally.
+
+The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
+
+```text
+penis       -> Profanity
+p3n1s       -> Profanity / Obfuscated
+boobs       -> Profanity
+b00bs       -> Profanity / Obfuscated
+vagina      -> Profanity
+v4g1n4      -> Profanity / Obfuscated
+myp3n1sname -> Profanity / Partial (after obfuscation)
+```
 
 Disable the entire profanity category when an application intentionally permits these identifiers:
 
@@ -259,8 +286,7 @@ Or disable profanity matching through the rule:
 options.DisableRule(Rule.Profanity);
 ```
 
-Forty-two low-collision global explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
-
+Forty-two low-collision expanded explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
 ## 0.8.0 default behavior
 
 The 0.8.0 baseline is stricter than 0.7.8.

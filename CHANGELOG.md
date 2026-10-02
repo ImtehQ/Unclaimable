@@ -2,23 +2,23 @@
 
 ## 0.8.1 - 2026-10-02
 
-> **Default-behavior note:** 0.8.1 expands the existing default-on profanity protection with a language-independent multilingual explicit, sexual, and anatomical corpus. Applications that intentionally allow these identifiers should regression-test their real username corpus before upgrading.
+> **Default-behavior note:** 0.8.1 expands the localized profanity filters and enables multilingual profanity matching by default. Applications that intentionally scope profanity to selected languages should set `MultilingualProfanityMatching = false` and regression-test their real username corpus before upgrading.
 
 ### Added
 
-- A global `Category.Profanity` dataset for high-confidence explicit, sexual, and anatomical terms across all 15 supported language families. These entries are always available and are not controlled by `Options.Languages`, preventing a user from bypassing this protection simply by switching languages.
-- Coverage for English terms such as `boob`, `boobs`, `penis`, `vagina`, and `vulva`, plus high-confidence equivalents and common forms from Dutch, German, French, Spanish, Italian, Portuguese, Polish, Turkish, Indonesian, Czech, Vietnamese, Hungarian, Swedish, and Romanian.
-- Regression coverage proving the new entries use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myb00bname` and `myp3n1sname`.
+- 174 high-confidence explicit, sexual, and anatomical profanity entries distributed across the normal profanity datasets for all 15 supported language families.
+- `Options.MultilingualProfanityMatching`, enabled by default. When enabled, profanity datasets from all supported languages participate even when those languages are not selected in `Options.Languages`. When disabled, profanity follows the selected language packs normally.
+- Regression coverage for all 174 expanded terms in both language-scoped and multilingual modes.
+- Coverage proving the expanded terms use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myb00bname` and `myp3n1sname`.
 - Forty-two low-collision explicit terms are curated partial roots so simple prefix/suffix wrapping does not bypass protection. Collision-prone short forms remain exact-only; examples such as `cocktail`, `penelope`, `janus`, and `dickens` remain claimable by this dataset.
 - Core dataset coverage increases from **11,150** to **11,324 filter entries** and from **11,039** to **11,108 category-unique values**. The category count remains **23**.
 
 ### Changed
 
-- General localized profanity remains scoped to enabled language packs. Only the new high-confidence explicit, sexual, and anatomical corpus is global, avoiding a broad change that would make every localized insult or slang term active in every application.
-- `Category.Profanity` and `Rule.Profanity` remain the explicit opt-outs. `ProfanityPartialMatching` remains opt-in, so the new global terms do not automatically become arbitrary substring rules.
-- No new public enum values or configuration APIs are introduced in 0.8.1.
+- `Options.Languages` still controls ordinary localized data. Profanity follows those selected languages when `MultilingualProfanityMatching` is disabled; with the default multilingual mode enabled, profanity from unselected language packs is also included.
+- `Category.Profanity` and `Rule.Profanity` remain the explicit opt-outs. `ProfanityPartialMatching` remains opt-in for broad non-curated substring matching.
+- No new public enum values are introduced in 0.8.1.
 - NuGet package-validation baselines move from 0.7.8 to the published 0.8.0 packages for all four first-party packages.
-
 ## 0.8.0 - 2026-09-21
 
 > **Default-behavior warning:** 0.8.0 intentionally establishes a stricter default policy than 0.7.8. Applications upgrading from an older release should run their real identifier regression corpus before deployment. The new exception APIs are designed to make narrow compatibility exceptions without disabling an entire protection.
