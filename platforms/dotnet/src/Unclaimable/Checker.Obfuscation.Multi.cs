@@ -20,6 +20,12 @@ public sealed partial class Checker
             }
         }
 
+        if (sensitivity >= ObfuscationSensitivity.Extreme
+            && TryMatchExtremeSymbolSequence(source, index, target, out consumed))
+        {
+            return true;
+        }
+
         consumed = 0;
         return false;
     }
