@@ -136,7 +136,7 @@ public sealed partial class Options
     /// <summary>
     /// Replaces the default all-language multilingual profanity set with the supplied languages.
     /// Normally selected <see cref="Languages"/> continue to participate independently.
-    /// Pass no languages to allow no additional profanity languages.
+    /// Pass no languages to restore the default of all supported languages.
     /// </summary>
     /// <param name="languages">Additional language profanity datasets to include.</param>
     /// <returns>This options instance.</returns>
@@ -145,6 +145,12 @@ public sealed partial class Options
         if (languages is null)
         {
             throw new ArgumentNullException(nameof(languages));
+        }
+
+        if (languages.Length == 0)
+        {
+            _multilingualProfanityLanguages = null;
+            return this;
         }
 
         var selected = new HashSet<Language>();

@@ -262,6 +262,16 @@ options.AddLanguage(Language.Dutch); // Now Dutch profanity applies too.
 
 This switch affects only profanity language selection. Other localized categories still follow `Options.Languages` normally.
 
+By default, multilingual profanity matching uses all supported languages. Restrict only the additional profanity languages with:
+
+```csharp
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+Languages already selected through `Options.Languages` remain active independently. Calling `SetMultilingualProfanityLanguages()` with no arguments restores the default all-language multilingual profanity set.
+
 The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
 
 ```text

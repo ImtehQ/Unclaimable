@@ -313,16 +313,22 @@ public sealed class Profanity081Tests
     }
 
     [Fact]
-    public void EmptyMultilingualProfanityOverrideUsesOnlyNormallySelectedLanguages()
+    public void EmptyMultilingualProfanityOverrideRestoresAllSupportedLanguages()
     {
         var options = new Options()
-            .SetMultilingualProfanityLanguages();
+            .SetMultilingualProfanityLanguages(Language.Dutch);
+
+        options.SetMultilingualProfanityLanguages();
 
         var checker = new Checker(options);
 
+        Assert.Equal(
+            Enum.GetValues<Language>().OrderBy(language => language),
+            options.MultilingualProfanityLanguages.OrderBy(language => language));
         Assert.Equal("profanity", checker.Check("fuck").Category);
-        Assert.True(checker.IsClaimable("godverdomme"));
-        Assert.True(checker.IsClaimable("pimmel"));
+        Assert.Equal("profanity", checker.Check("godverdomme").Category);
+        Assert.Equal("profanity", checker.Check("pimmel").Category);
+        Assert.Equal("profanity", checker.Check("putain").Category);
     }
 
     [Fact]

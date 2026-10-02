@@ -18,19 +18,135 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## Current release: 0.8.1
+## Current release: 0.8.1 LTS
 
 0.8.1 extends the normal localized profanity filters and adds default-on multilingual profanity matching so changing languages cannot be used as a profanity bypass.
 
 ## 0.8.1: multilingual profanity hardening
 
-`Category.Profanity` already existed and remains enabled by default. The 174 expanded explicit, sexual, and anatomical terms now live in their appropriate language profanity datasets rather than in a separate global dataset.
+0.8.1 substantially expands Unclaimable's profanity protection and adds more control over how multilingual profanity filtering is applied.
 
-`Options.MultilingualProfanityMatching` is enabled by default. With it enabled, profanity from all supported language packs participates even if `Options.Languages` contains only English. Set it to `false` when profanity should follow only the selected language packs. For example, English profanity continues to work with English selected while Dutch profanity remains inactive until Dutch is added.
+Profanity remains part of the normal localized language datasets. English profanity belongs to the English filter, Dutch profanity belongs to the Dutch filter, German profanity belongs to the German filter, and so on across all 15 supported languages.
 
-The expanded entries use the same exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline as the rest of Core. Forms such as `p3n1s`, `b00bs`, `v4g1n4`, and `t1ts` are matched through the existing obfuscation rules.
+### Multilingual profanity matching
 
-Forty-two low-collision expanded terms are curated partial roots, so wrappers such as `myp3n1sname` are blocked while collision-prone forms remain exact-only. Applications can still disable profanity entirely with `DisableCategory(Category.Profanity)` or `DisableRule(Rule.Profanity)`. Broad non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
+`MultilingualProfanityMatching` is enabled by default.
+
+With the default configuration, profanity from **all supported languages** is checked even though English is the only normal language enabled by default:
+
+```csharp
+var options = new Options();
+var checker = new Checker(options);
+```
+
+This helps prevent users from bypassing profanity protection simply by using profanity from another language.
+
+The multilingual profanity languages can also be restricted explicitly:
+
+```csharp
+var options = new Options();
+
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+English is still the normal selected language, so this configuration checks profanity from English, Dutch, and German without enabling Dutch or German support, system, role, or other localized datasets.
+
+Normal languages selected through `AddLanguage(...)` are always included independently:
+
+```csharp
+var options = new Options();
+
+options.AddLanguage(Language.French);
+
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+This enables the normal English and French language datasets, while profanity is checked for English, French, Dutch, and German.
+
+Calling the method without parameters restores the default multilingual behavior:
+
+```csharp
+options.SetMultilingualProfanityLanguages();
+```
+
+This selects **all supported languages** for multilingual profanity matching.
+
+To disable the multilingual behavior completely:
+
+```csharp
+var options = new Options
+{
+    MultilingualProfanityMatching = false
+};
+```
+
+Profanity then follows only the languages selected through `Options.Languages`.
+
+### Expanded profanity coverage
+
+0.8.1 adds **474 profanity filter entries** compared with 0.8.0.
+
+The expansion consists of:
+
+- **174** high-confidence explicit, sexual, and anatomical entries distributed across all 15 supported languages.
+- **300** additional profanity, vulgar-insult, obscene-expression, and sexual-slang entries across the smaller language filters.
+- **42** carefully selected low-collision explicit terms that support curated partial matching.
+- The broader 300-entry expansion remains exact-only to reduce avoidable substring false positives.
+
+Existing obfuscation and leetspeak protection continues to apply where appropriate, including forms such as `p3n1s`, `b00bs`, and `v4g1n4`.
+
+Short or collision-prone terms remain conservative by default. Identifiers such as `cocktail`, `penelope`, `janus`, and `dickens` are not rejected simply because they contain a short profanity-like sequence.
+
+### Profanity coverage by language
+
+| Language | Unique profanity values |
+| --- | ---: |
+| English | 311 |
+| Dutch | 130 |
+| German | 138 |
+| French | 55 |
+| Spanish | 55 |
+| Italian | 50 |
+| Portuguese | 59 |
+| Polish | 60 |
+| Turkish | 51 |
+| Indonesian | 45 |
+| Czech | 50 |
+| Vietnamese | 59 |
+| Hungarian | 53 |
+| Swedish | 58 |
+| Romanian | 56 |
+
+### Dataset size
+
+- **Filter entries:** 11,156 → **11,630**
+- **Category-unique values:** 11,039 → **11,404**
+- **Profanity entries:** 861 → **1,335**
+- **Unique profanity values:** 848 → **1,213**
+- **Built-in categories:** remains **23**
+
+### Existing controls remain available
+
+Profanity can still be disabled entirely through the existing category or rule controls:
+
+```csharp
+options.DisableCategory(Category.Profanity);
+```
+
+or:
+
+```csharp
+options.DisableRule(Rule.Profanity);
+```
+
+`ProfanityPartialMatching` remains opt-in for applications that deliberately want broader substring matching.
+
+The profanity datasets are covered by automated tests across all 15 supported languages, including language-scoped configuration, multilingual configuration, restricted multilingual language sets, obfuscation matching, curated partial matching, and category/rule opt-outs.
+
 ## 0.8.0: stricter defaults with narrow exceptions
 
 The important behavioral change is that Unclaimable now leans consistently into deny-first validation. Protected identity rules are enabled by default, selected high-trust roots such as `admin`, `staff`, `root`, `owner`, `support`, and `help` can reject containing identifiers, and repeated-pattern defaults are more explicit.

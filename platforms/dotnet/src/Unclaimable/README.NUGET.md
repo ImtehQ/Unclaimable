@@ -32,15 +32,81 @@ The Core package targets `netstandard2.0` and is intended for portable applicati
 
 No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for the Core checker; NuGet resolves the portable asset automatically.
 
-## Multilingual profanity hardening in 0.8.1
+## What's new in 0.8.1
 
-`Category.Profanity` remains enabled by default. The release adds 174 high-confidence explicit, sexual, and anatomical entries across all 15 language filters, plus 300 additional exact-only profanity and vulgar-expression entries across the eight smaller language filters.
+0.8.1 significantly expands Unclaimable's profanity protection and introduces configurable multilingual profanity filtering.
 
-`MultilingualProfanityMatching` is enabled by default, so profanity from unselected language packs is also checked. Set it to `false` when profanity should follow only `Options.Languages`. English profanity therefore still works with the default English language selected, while Dutch profanity requires `Language.Dutch` when multilingual mode is disabled.
+Profanity continues to live in the normal localized datasets. English profanity belongs to the English dataset, Dutch profanity to the Dutch dataset, and so on across all 15 supported languages.
 
-The expanded entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline, so variants such as `p3n1s`, `b00bs`, and `v4g1n4` are covered by the existing matcher. Forty-two low-collision explicit terms are curated partial roots; the 300 broader language-filter additions are exact-only, and collision-prone forms remain exact-only by default.
+### Multilingual profanity
 
-Disable profanity entirely with `options.DisableCategory(Category.Profanity)` or `options.DisableRule(Rule.Profanity)`. Broad, non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
+`MultilingualProfanityMatching` is enabled by default.
+
+With no additional configuration, profanity from **all supported languages** is checked:
+
+```csharp
+var options = new Options();
+```
+
+The additional multilingual profanity languages can be restricted:
+
+```csharp
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+Normal languages configured through `Options.Languages` remain active independently. With English selected by default, the example above checks English, Dutch, and German profanity without enabling the other Dutch or German localized datasets.
+
+Calling the method without parameters selects all supported profanity languages again:
+
+```csharp
+options.SetMultilingualProfanityLanguages();
+```
+
+To restrict profanity completely to the normal selected language datasets:
+
+```csharp
+var options = new Options
+{
+    MultilingualProfanityMatching = false
+};
+```
+
+### Expanded profanity datasets
+
+0.8.1 adds **474 profanity filter entries** compared with 0.8.0:
+
+- 174 high-confidence explicit, sexual, and anatomical entries across all 15 supported languages.
+- 300 additional exact-only profanity and vulgar-expression entries across the smaller language filters.
+- 42 curated low-collision explicit terms that support partial matching.
+
+Existing obfuscation matching continues to apply where appropriate, including forms such as `p3n1s`, `b00bs`, and `v4g1n4`.
+
+Short and collision-prone terms remain exact-only unless broader profanity partial matching is explicitly enabled.
+
+### Dataset totals
+
+- **Filter entries:** 11,156 → **11,630**
+- **Category-unique values:** 11,039 → **11,404**
+- **Profanity entries:** 861 → **1,335**
+- **Unique profanity values:** 848 → **1,213**
+- **Built-in categories:** remains **23**
+
+Profanity can still be disabled through the existing controls:
+
+```csharp
+options.DisableCategory(Category.Profanity);
+```
+
+or:
+
+```csharp
+options.DisableRule(Rule.Profanity);
+```
+
+The expanded profanity datasets are covered by automated tests across all 15 supported languages, including full multilingual matching, restricted multilingual language sets, individual language selection, obfuscation matching, curated partial matching, and profanity opt-outs.
+
 ## Strict defaults in 0.8.0
 
 0.8.0 enables every built-in Core identity/protection `Rule` by default except `Rule.Numbers`. The numeric-only, repeated, symbol-only, and ASCII-art patterns are enabled by default; `Pattern.UppercaseOnly` remains opt-in. Mixed alphanumeric and ordinary uppercase identifiers remain allowed unless those stricter checks are explicitly enabled.
