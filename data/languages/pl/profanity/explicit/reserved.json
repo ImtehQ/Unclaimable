@@ -1,0 +1,20 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "pl",
+  "description": "High-confidence Polish explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "srom",
+    "odbyt",
+    "cycki",
+    "chuj",
+    "cipa",
+    "kutas",
+    "pizda",
+    "jebać",
+    "pierdolić"
+  ],
+  "partialValues": [
+    "pochwa"
+  ]
+}

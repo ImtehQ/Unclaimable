@@ -16,7 +16,7 @@
     <PackageTags>username;validation;security;reserved-names;identity;impersonation;moderation;dotnet;cross-platform;maui;blazor;webassembly;wpf;winforms;console;worker-service;avalonia;uno</PackageTags>
 
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>0.7.8</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>0.8.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -18,9 +18,134 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## Current release: 0.8.0
+## Current release: 0.8.1 LTS
 
-0.8.0 establishes the default policy we intend to keep stable going forward: deny-first validation, default-on protected identity rules, clearer repeated-pattern behavior, and narrow exceptions that let applications relax one check without disabling an entire protection.
+0.8.1 extends the normal localized profanity filters and adds default-on multilingual profanity matching so changing languages cannot be used as a profanity bypass.
+
+## 0.8.1: multilingual profanity hardening
+
+0.8.1 substantially expands Unclaimable's profanity protection and adds more control over how multilingual profanity filtering is applied.
+
+Profanity remains part of the normal localized language datasets. English profanity belongs to the English filter, Dutch profanity belongs to the Dutch filter, German profanity belongs to the German filter, and so on across all 15 supported languages.
+
+### Multilingual profanity matching
+
+`MultilingualProfanityMatching` is enabled by default.
+
+With the default configuration, profanity from **all supported languages** is checked even though English is the only normal language enabled by default:
+
+```csharp
+var options = new Options();
+var checker = new Checker(options);
+```
+
+This helps prevent users from bypassing profanity protection simply by using profanity from another language.
+
+The multilingual profanity languages can also be restricted explicitly:
+
+```csharp
+var options = new Options();
+
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+English is still the normal selected language, so this configuration checks profanity from English, Dutch, and German without enabling Dutch or German support, system, role, or other localized datasets.
+
+Normal languages selected through `AddLanguage(...)` are always included independently:
+
+```csharp
+var options = new Options();
+
+options.AddLanguage(Language.French);
+
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+This enables the normal English and French language datasets, while profanity is checked for English, French, Dutch, and German.
+
+Calling the method without parameters restores the default multilingual behavior:
+
+```csharp
+options.SetMultilingualProfanityLanguages();
+```
+
+This selects **all supported languages** for multilingual profanity matching.
+
+To disable the multilingual behavior completely:
+
+```csharp
+var options = new Options
+{
+    MultilingualProfanityMatching = false
+};
+```
+
+Profanity then follows only the languages selected through `Options.Languages`.
+
+### Expanded profanity coverage
+
+0.8.1 adds **474 profanity filter entries** compared with 0.8.0.
+
+The expansion consists of:
+
+- **174** high-confidence explicit, sexual, and anatomical entries distributed across all 15 supported languages.
+- **300** additional profanity, vulgar-insult, obscene-expression, and sexual-slang entries across the smaller language filters.
+- **42** carefully selected low-collision explicit terms that support curated partial matching.
+- The broader 300-entry expansion remains exact-only to reduce avoidable substring false positives.
+
+Existing obfuscation and leetspeak protection continues to apply where appropriate, including forms such as `p3n1s`, `b00bs`, and `v4g1n4`.
+
+Short or collision-prone terms remain conservative by default. Identifiers such as `cocktail`, `penelope`, `janus`, and `dickens` are not rejected simply because they contain a short profanity-like sequence.
+
+### Profanity coverage by language
+
+| Language | Unique profanity values |
+| --- | ---: |
+| English | 311 |
+| Dutch | 130 |
+| German | 138 |
+| French | 55 |
+| Spanish | 55 |
+| Italian | 50 |
+| Portuguese | 59 |
+| Polish | 60 |
+| Turkish | 51 |
+| Indonesian | 45 |
+| Czech | 50 |
+| Vietnamese | 59 |
+| Hungarian | 53 |
+| Swedish | 58 |
+| Romanian | 56 |
+
+### Dataset size
+
+- **Filter entries:** 11,156 → **11,630**
+- **Category-unique values:** 11,039 → **11,404**
+- **Profanity entries:** 861 → **1,335**
+- **Unique profanity values:** 848 → **1,213**
+- **Built-in categories:** remains **23**
+
+### Existing controls remain available
+
+Profanity can still be disabled entirely through the existing category or rule controls:
+
+```csharp
+options.DisableCategory(Category.Profanity);
+```
+
+or:
+
+```csharp
+options.DisableRule(Rule.Profanity);
+```
+
+`ProfanityPartialMatching` remains opt-in for applications that deliberately want broader substring matching.
+
+The profanity datasets are covered by automated tests across all 15 supported languages, including language-scoped configuration, multilingual configuration, restricted multilingual language sets, obfuscation matching, curated partial matching, and category/rule opt-outs.
 
 ## 0.8.0: stricter defaults with narrow exceptions
 
@@ -73,7 +198,7 @@ abcabc   -> rejected: repeated span reaches 6
 
 All built-in rules are enabled by default except `Rule.Numbers`; this includes the protected country, city, celebrity, and other identity rules. Mixed alphanumeric names remain possible, while `Pattern.NumericOnly` continues to reject all-numeric identifiers. `Pattern.UppercaseOnly` remains opt-in.
 
-For copy-paste recipes, precedence, migration guidance, ASP.NET Core setup, Email local-part customization, and Extended-data exceptions, see the **[0.8.0 configuration and exceptions guide](docs/CONFIGURATION.md)**.
+For copy-paste recipes, precedence, migration guidance, ASP.NET Core setup, Email local-part customization, and Extended-data exceptions, see the **[configuration and exceptions guide](docs/CONFIGURATION.md)**.
 
 ## Companion packages
 
@@ -81,13 +206,13 @@ The repository contains three companion packages that share the same release ver
 
 ### Unclaimable.AspNetCore
 
-Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.0 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core default rules unless the application configures them differently.
+Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.1 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
 
 See [the ASP.NET Core package README](platforms/dotnet/src/Unclaimable.AspNetCore/README.NUGET.md).
 
 ### Unclaimable.Email
 
-Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.0 identity defaults, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
+Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.1 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
 
 See [the Email package README](platforms/dotnet/src/Unclaimable.Email/README.NUGET.md).
 
@@ -179,9 +304,10 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 ## Features
 
 - Reserved-name protection across **23 built-in categories**
-- **11,150 filter entries** representing **11,039 unique values**
+- **11,630 filter entries** representing **11,404 category-unique values**
 - Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
+- Default-on multilingual profanity matching across the localized profanity datasets under `Category.Profanity`
 - Per-category enable/disable controls
 - Exact built-in exceptions, scoped rule/pattern allowances, and application-specific reservations
 - Configurable numeric-only, repeated, symbol-only, ASCII-art, and uppercase-only pattern checks
@@ -204,7 +330,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 
 ### Application ecosystem compatibility
 
-The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.0 compatibility workflow compile-checks consumers for:
+The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.1 compatibility workflow compile-checks consumers for:
 
 - .NET MAUI (Android);
 - Blazor WebAssembly;
@@ -220,10 +346,10 @@ Those application models use the same portable packages; there is no separate MA
 Install the current release:
 
 ```bash
-dotnet add package Unclaimable --version 0.8.0
-dotnet add package Unclaimable.AspNetCore --version 0.8.0
-dotnet add package Unclaimable.Email --version 0.8.0
-dotnet add package Unclaimable.Extended --version 0.8.0
+dotnet add package Unclaimable --version 0.8.1
+dotnet add package Unclaimable.AspNetCore --version 0.8.1
+dotnet add package Unclaimable.Email --version 0.8.1
+dotnet add package Unclaimable.Extended --version 0.8.1
 ```
 
 ## Quick start

@@ -1,0 +1,23 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "fr",
+  "description": "High-confidence French explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "vagin",
+    "bite",
+    "teub",
+    "zob",
+    "chatte",
+    "baise",
+    "branler",
+    "branlette",
+    "niquer",
+    "encule"
+  ],
+  "partialValues": [
+    "pénis",
+    "vulve",
+    "nichons"
+  ]
+}

@@ -158,6 +158,7 @@ public sealed class AdditionalLanguageTests
     private static Options CreateOptions() => new Options
     {
         Strictness = Strictness.Standard,
+        MultilingualProfanityMatching = false,
         DisabledRules = StructuralRules | OptionalIdentityRules
     };
 

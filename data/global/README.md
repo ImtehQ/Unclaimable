@@ -15,6 +15,6 @@ Current global categories:
 - `placeholders` — null-like, unset, missing and placeholder identifiers that should not be claimed as user identities;
 - `other` — protected platform-facing names that do not fit cleanly into another category.
 
-Each dataset uses schema version `1` and declares `"language": "global"` explicitly.
+Global datasets declare `"language": "global"` explicitly. They may use schema version `1` for exact values or schema version `2` when curated partial values or generated combinations are needed.
 
-When adding values, prefer a specific category over `other`, avoid duplicates across existing localized datasets, and keep ordinary personal names claimable whenever possible.
+When adding values, prefer a specific category over `other`, avoid duplicates across existing localized datasets, and keep ordinary personal names claimable whenever possible. Profanity remains language-scoped data; cross-language profanity behavior is controlled by `Options.MultilingualProfanityMatching`.

@@ -1,0 +1,20 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "ro",
+  "description": "High-confidence Romanian explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "sâni",
+    "sani",
+    "țâțe",
+    "curvă",
+    "muie",
+    "pizdă",
+    "pulă",
+    "sugi pula"
+  ],
+  "partialValues": [
+    "penisuri",
+    "vulvă"
+  ]
+}

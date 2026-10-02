@@ -12,12 +12,16 @@ public sealed partial class Options
     {
     }
 
+    private static readonly Language[] AllSupportedLanguages =
+        (Language[])Enum.GetValues(typeof(Language));
+
     private bool _partialMatching;
     private readonly HashSet<string> _additionalBlockedCharacters = new HashSet<string>(StringComparer.Ordinal);
     private readonly HashSet<Language> _languages = new HashSet<Language>
     {
         Language.English
     };
+    private HashSet<Language>? _multilingualProfanityLanguages;
 
     /// <summary>
     /// Controls how aggressively reserved-name rules are applied.
@@ -40,6 +44,8 @@ public sealed partial class Options
     /// Use <see cref="AddLanguage"/> and <see cref="RemoveLanguage"/> to change the enabled set.
     /// Removing language-pack folders from a source checkout is also supported; missing packs simply
     /// contribute no embedded entries. Global datasets such as brands and technology are always included.
+    /// When <see cref="MultilingualProfanityMatching"/> is enabled, profanity datasets are additionally
+    /// loaded from languages that are not selected here.
     /// </summary>
     public IReadOnlyCollection<Language> Languages => _languages;
 
@@ -103,10 +109,60 @@ public sealed partial class Options
     public int PartialMatchMinimumLength { get; set; } = 4;
 
     /// <summary>
-    /// Include profanity from the enabled localized dataset or datasets. Enabled by default.
-    /// Kept for compatibility; prefer disabling <see cref="Rule.Profanity"/>.
+    /// Enables profanity matching for the currently selected language datasets.
+    /// Enabled by default. Disable <see cref="Rule.Profanity"/> to turn profanity matching off entirely.
     /// </summary>
     public bool ProfanityMatching { get; set; } = true;
+
+    /// <summary>
+    /// When enabled, profanity datasets from additional languages participate even when those languages
+    /// are not present in <see cref="Languages"/>. Enabled by default to prevent language-switching bypasses.
+    /// By default every supported language is included. Use <see cref="SetMultilingualProfanityLanguages"/>
+    /// to restrict the additional profanity languages while keeping the normally selected languages active.
+    /// Set this to <see langword="false"/> to ignore the multilingual override entirely.
+    /// </summary>
+    public bool MultilingualProfanityMatching { get; set; } = true;
+
+    /// <summary>
+    /// Languages currently eligible to be pulled in only for multilingual profanity matching.
+    /// Defaults to every supported language. Languages already present in <see cref="Languages"/> remain
+    /// active for profanity regardless of this collection.
+    /// </summary>
+    public IReadOnlyCollection<Language> MultilingualProfanityLanguages =>
+        _multilingualProfanityLanguages is null
+            ? (IReadOnlyCollection<Language>)AllSupportedLanguages
+            : _multilingualProfanityLanguages;
+
+    /// <summary>
+    /// Replaces the default all-language multilingual profanity set with the supplied languages.
+    /// Normally selected <see cref="Languages"/> continue to participate independently.
+    /// Pass no languages to restore the default of all supported languages.
+    /// </summary>
+    /// <param name="languages">Additional language profanity datasets to include.</param>
+    /// <returns>This options instance.</returns>
+    public Options SetMultilingualProfanityLanguages(params Language[] languages)
+    {
+        if (languages is null)
+        {
+            throw new ArgumentNullException(nameof(languages));
+        }
+
+        if (languages.Length == 0)
+        {
+            _multilingualProfanityLanguages = null;
+            return this;
+        }
+
+        var selected = new HashSet<Language>();
+        foreach (var language in languages)
+        {
+            ValidateLanguage(language, nameof(languages));
+            selected.Add(language);
+        }
+
+        _multilingualProfanityLanguages = selected;
+        return this;
+    }
 
     /// <summary>
     /// Allow ordinary profanity entries to participate in substring matching when partial matching is enabled.

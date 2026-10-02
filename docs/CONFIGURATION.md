@@ -1,4 +1,4 @@
-# Configuring Unclaimable 0.8.0
+# Configuring Unclaimable 0.8.1
 
 This guide explains how to keep Unclaimable's strict defaults while making small, intentional exceptions for an application's naming rules.
 
@@ -20,7 +20,7 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.0 default is intentionally strict. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds default-on multilingual profanity matching across the localized profanity datasets. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
 
 ### Add an application-specific reserved name
 
@@ -228,6 +228,98 @@ The uppercase-only pattern is skipped, but `ADMIN` still resolves to the reserve
 | Allow one Extended identity | `ExtendedOptions.AllowedIdentifiers` | one Extended registration |
 
 Prefer the narrowest API that expresses the application's actual rule.
+
+## 0.8.1 multilingual profanity behavior
+
+`Category.Profanity` and `Rule.Profanity` remain enabled by default. The expanded explicit, sexual, and anatomical terms are stored in their normal per-language profanity datasets.
+
+`MultilingualProfanityMatching` is enabled by default. This causes profanity datasets from all supported languages to participate even when those languages are not selected in `Options.Languages`:
+
+```csharp
+var options = new Options(); // English selected; multilingual profanity enabled by default.
+var checker = new Checker(options);
+
+// English profanity.
+checker.Check("penis");
+
+// Dutch profanity is also protected by multilingual mode.
+checker.Check("piemel");
+checker.Check("godverdomme");
+```
+
+To make profanity follow only the selected language packs, disable multilingual profanity matching:
+
+```csharp
+var options = new Options
+{
+    MultilingualProfanityMatching = false
+};
+
+// English is selected by default, so English profanity still applies.
+// Dutch profanity is not loaded yet.
+options.AddLanguage(Language.Dutch); // Now Dutch profanity applies too.
+```
+
+This switch affects only profanity language selection. Other localized categories still follow `Options.Languages` normally.
+
+By default, multilingual profanity matching uses all supported languages. Restrict only the additional profanity languages with:
+
+```csharp
+options.SetMultilingualProfanityLanguages(
+    Language.Dutch,
+    Language.German);
+```
+
+Languages already selected through `Options.Languages` remain active independently. Calling `SetMultilingualProfanityLanguages()` with no arguments restores the default all-language multilingual profanity set.
+
+The entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable pipeline:
+
+```text
+penis       -> Profanity
+p3n1s       -> Profanity / Obfuscated
+boobs       -> Profanity
+b00bs       -> Profanity / Obfuscated
+vagina      -> Profanity
+v4g1n4      -> Profanity / Obfuscated
+myp3n1sname -> Profanity / Partial (after obfuscation)
+```
+
+Disable the entire profanity category when an application intentionally permits these identifiers:
+
+```csharp
+options.DisableCategory(Category.Profanity);
+```
+
+Or disable profanity matching through the rule:
+
+```csharp
+options.DisableRule(Rule.Profanity);
+```
+
+Forty-two low-collision expanded explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
+### Profanity coverage in 0.8.1
+
+The profanity filters now contain the following distinct values per language. These are per-language counts, so the same spelling appearing in more than one language is counted once in each relevant filter.
+
+| Language | Unique profanity values |
+| --- | ---: |
+| English | 311 |
+| Dutch | 130 |
+| German | 138 |
+| French | 55 |
+| Spanish | 55 |
+| Italian | 50 |
+| Portuguese | 59 |
+| Polish | 60 |
+| Turkish | 51 |
+| Indonesian | 45 |
+| Czech | 50 |
+| Vietnamese | 59 |
+| Hungarian | 53 |
+| Swedish | 58 |
+| Romanian | 56 |
+
+The eight previously smaller filters received **300 additional exact-only entries** in 0.8.1. Exact-only expansion improves whole-identifier coverage without turning short or common profanity terms into broad substring rules.
 
 ## 0.8.0 default behavior
 

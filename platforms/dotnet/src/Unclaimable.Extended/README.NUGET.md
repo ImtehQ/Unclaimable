@@ -2,12 +2,12 @@
 
 Large optional reserved-identity datasets for Unclaimable.
 
-**Package version: 0.8.0**
+**Package version: 0.8.1**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable.Extended --version 0.8.0
+dotnet add package Unclaimable.Extended --version 0.8.1
 ```
 
 Installing the package alone does not change validation behavior. Enable the data explicitly.
@@ -32,7 +32,7 @@ var checker = new Checker(options);
 
 All Extended groups are enabled after opt-in.
 
-The checker still uses the normal 0.8.0 Core defaults at the same time. Extended data is additive: opting in does not disable or replace country, city, celebrity, identity, structural, matching, or pattern rules that are already active in `Options`.
+The checker still uses the normal 0.8.1 Core defaults at the same time. Extended data is additive: opting in does not disable or replace country, city, celebrity, identity, structural, matching, or pattern rules that are already active in `Options`.
 
 ## Select categories
 

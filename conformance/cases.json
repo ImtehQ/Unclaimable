@@ -128,5 +128,35 @@
     "value": "ownership",
     "reserved": true,
     "category": "roles"
+  },
+  {
+    "value": "penis",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "p3n1s",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "piemel",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "vagína",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "myp3n1sname",
+    "reserved": true,
+    "category": "profanity"
+  },
+  {
+    "value": "cocktail",
+    "reserved": false,
+    "category": null
   }
 ]
