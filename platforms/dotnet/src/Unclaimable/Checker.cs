@@ -235,7 +235,9 @@ public sealed partial class Checker : IChecker
 
             if (entry.Language.HasValue
                 && !options.Languages.Contains(entry.Language.Value)
-                && !(isProfanity && options.MultilingualProfanityMatching))
+                && !(isProfanity
+                     && options.MultilingualProfanityMatching
+                     && options.MultilingualProfanityLanguages.Contains(entry.Language.Value)))
             {
                 continue;
             }

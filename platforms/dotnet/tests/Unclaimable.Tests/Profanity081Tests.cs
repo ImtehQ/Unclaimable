@@ -283,6 +283,76 @@ public sealed class Profanity081Tests
         Assert.Equal("profanity", checker.Check("pimmel").Category);
     }
 
+    [Fact]
+    public void MultilingualProfanityLanguageOverrideLimitsOnlyExtraProfanityLanguages()
+    {
+        var options = new Options()
+            .SetMultilingualProfanityLanguages(Language.Dutch, Language.German);
+
+        var checker = new Checker(options);
+
+        Assert.Equal("profanity", checker.Check("fuck").Category);
+        Assert.Equal("profanity", checker.Check("godverdomme").Category);
+        Assert.Equal("profanity", checker.Check("pimmel").Category);
+        Assert.True(checker.IsClaimable("putain"));
+        Assert.True(checker.IsClaimable("facturatiehulp"));
+    }
+
+    [Fact]
+    public void NormallySelectedLanguageStillProvidesProfanityOutsideMultilingualOverride()
+    {
+        var options = new Options()
+            .SetMultilingualProfanityLanguages(Language.Dutch);
+
+        options.AddLanguage(Language.French);
+        var checker = new Checker(options);
+
+        Assert.Equal("profanity", checker.Check("putain").Category);
+        Assert.Equal("profanity", checker.Check("godverdomme").Category);
+        Assert.True(checker.IsClaimable("pimmel"));
+    }
+
+    [Fact]
+    public void EmptyMultilingualProfanityOverrideUsesOnlyNormallySelectedLanguages()
+    {
+        var options = new Options()
+            .SetMultilingualProfanityLanguages();
+
+        var checker = new Checker(options);
+
+        Assert.Equal("profanity", checker.Check("fuck").Category);
+        Assert.True(checker.IsClaimable("godverdomme"));
+        Assert.True(checker.IsClaimable("pimmel"));
+    }
+
+    [Fact]
+    public void MultilingualProfanityLanguageOverrideDefaultsToAllSupportedLanguages()
+    {
+        var options = new Options();
+
+        Assert.Equal(
+            Enum.GetValues<Language>().OrderBy(language => language),
+            options.MultilingualProfanityLanguages.OrderBy(language => language));
+    }
+
+    [Fact]
+    public void MultilingualProfanityLanguageOverrideRejectsUnsupportedLanguageValues()
+    {
+        var options = new Options();
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => options.SetMultilingualProfanityLanguages((Language)999));
+    }
+
+    [Fact]
+    public void MultilingualProfanityLanguageOverrideRejectsNull()
+    {
+        var options = new Options();
+
+        Assert.Throws<ArgumentNullException>(
+            () => options.SetMultilingualProfanityLanguages(null!));
+    }
+
     [Theory]
     [InlineData("p3n1s", "penis")]
     [InlineData("b00bs", "boobs")]
