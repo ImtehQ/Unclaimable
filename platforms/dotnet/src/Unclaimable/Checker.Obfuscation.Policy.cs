@@ -16,7 +16,7 @@ public sealed partial class Checker
                 return 0;
             }
 
-            return entry.SafePartial || IsSensitiveObfuscationCategory(entry.Category) ? 1 : 0;
+            return entry.SafePartial ? 1 : 0;
         }
 
         if (_obfuscationSensitivity == ObfuscationSensitivity.High)
