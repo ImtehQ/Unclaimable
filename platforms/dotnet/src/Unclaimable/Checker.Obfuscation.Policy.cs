@@ -21,7 +21,10 @@ public sealed partial class Checker
 
         if (_obfuscationSensitivity == ObfuscationSensitivity.High)
         {
-            return targetLength >= 5 ? 1 : 0;
+            var minimumLength = entry.SafePartial || IsSensitiveObfuscationCategory(entry.Category)
+                ? 4
+                : 5;
+            return targetLength >= minimumLength ? 1 : 0;
         }
 
         return targetLength >= 7 ? 2 : 1;
