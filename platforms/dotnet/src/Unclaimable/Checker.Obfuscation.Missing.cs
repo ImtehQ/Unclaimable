@@ -12,7 +12,7 @@ public sealed partial class Checker
             && TryMatchObfuscationTextCore(
                 source, sourceIndex, target, targetIndex + 1,
                 preserveNonCompactCharacters, maxEdits, editsUsed + 1,
-                true, requireSourceEnd, failed, out endIndex))
+                transformed, requireSourceEnd, failed, out endIndex))
         {
             return true;
         }
