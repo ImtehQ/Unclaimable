@@ -180,6 +180,55 @@ public sealed class Obfuscation082AdvancedTests
         Assert.True(checker.IsClaimable("ordinarycandidate"));
     }
 
+
+    [Theory]
+    [InlineData("§ilo", "silo")]
+    public void MediumCoversAdditionalHighConfidenceVisualSymbols(string value, string reserved)
+    {
+        var options = new Options();
+        options.DisableRule(Rule.BlockedCharacters);
+        options.Reserve(reserved, ReservedMatchMode.WholeIdentifier);
+
+        var result = new Checker(options).Check(value);
+
+        Assert.True(result.IsReserved);
+        Assert.Equal(reserved, result.MatchedValue);
+    }
+
+    [Fact]
+    public void HighCoversBracketStyleCVisuals()
+    {
+        var options = new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.High
+        };
+        options.DisableRule(Rule.BlockedCharacters);
+        options.DisablePattern(Pattern.AsciiArt);
+        options.Reserve("cat", ReservedMatchMode.WholeIdentifier);
+
+        var result = new Checker(options).Check("[at");
+
+        Assert.True(result.IsReserved);
+        Assert.Equal("cat", result.MatchedValue);
+    }
+
+    [Theory]
+    [InlineData("securitx", "security")]
+    [InlineData("systen", "system")]
+    public void HighAppliesSingleEditProtectionToSensitiveBuiltInCategories(
+        string value,
+        string expectedCategory)
+    {
+        var result = new Checker(new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.High
+        }).Check(value);
+
+        Assert.True(result.IsReserved, value);
+        Assert.Equal(expectedCategory, result.Category);
+        Assert.Equal(MatchKind.Obfuscated, result.MatchKind);
+    }
+
     [Fact]
     public void MediumComposesSeparatorsLeetspeakAndOneEdit()
     {
