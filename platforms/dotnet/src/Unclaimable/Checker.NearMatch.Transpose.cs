@@ -4,7 +4,7 @@ public sealed partial class Checker
 {
     private bool TryNearMatchTranspose(
         string source, int si, string target, int ti, bool preserve,
-        int maxEdits, int nextEdits, bool requireEnd, HashSet<long> failed,
+        int maxEdits, int nextEdits, bool transformed, bool requireEnd, HashSet<long> failed,
         out int end)
     {
         if (si + 1 >= source.Length || ti + 1 >= target.Length)
@@ -26,7 +26,7 @@ public sealed partial class Checker
 
         return TryMatchObfuscationTextCore(
             source, si + 2, target, ti + 2,
-            preserve, maxEdits, nextEdits, true,
+            preserve, maxEdits, nextEdits, transformed || firstChanged || secondChanged,
             requireEnd, failed, out end);
     }
 }
