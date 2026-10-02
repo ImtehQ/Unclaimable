@@ -356,6 +356,8 @@ public sealed partial class Checker : IChecker
             return Result.Allowed(value);
         }
 
+        var obfuscationInput = NormalizeCaseAwareObfuscationInput(value, exact);
+
         var exactCustomResult = CheckExactCustomReservation(value, exact);
         if (exactCustomResult is not null)
         {
@@ -442,7 +444,7 @@ public sealed partial class Checker : IChecker
             int? confusableStart;
             int? confusableLength;
             if (TryMatchUnicodeConfusable(
-                    exact,
+                    obfuscationInput,
                     out confusableMatch,
                     out confusableKind,
                     out confusableStart,
@@ -463,7 +465,7 @@ public sealed partial class Checker : IChecker
             int? obfuscatedStart;
             int? obfuscatedLength;
             if (TryMatchObfuscated(
-                    exact,
+                    obfuscationInput,
                     out obfuscatedMatch,
                     out obfuscatedKind,
                     out obfuscatedStart,
