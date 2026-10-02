@@ -110,7 +110,7 @@ The default policy combines:
 
 - 23 built-in reserved-name categories;
 - English reserved-name data by default, with additional localized datasets available;
-- global multilingual explicit, sexual, and anatomical profanity reservations under `Category.Profanity`;
+- default-on multilingual profanity matching across the localized profanity datasets under `Category.Profanity`;
 - exact and compact matching;
 - curated partial matching;
 - obfuscation/leetspeak matching;
