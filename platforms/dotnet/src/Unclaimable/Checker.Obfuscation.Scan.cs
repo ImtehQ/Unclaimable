@@ -17,6 +17,19 @@ public sealed partial class Checker
 
         var directPotential = HasDirectObfuscationPotential(value);
 
+        if (directPotential
+            && TryMatchZeroCostObfuscation(
+                value,
+                index,
+                preserveNonCompactCharacters,
+                out match,
+                out matchKind,
+                out matchStartIndex,
+                out matchLength))
+        {
+            return true;
+        }
+
         foreach (var pair in directEntries)
         {
             var editBudget = GetObfuscationEditBudget(pair.Value, pair.Key.Length);
