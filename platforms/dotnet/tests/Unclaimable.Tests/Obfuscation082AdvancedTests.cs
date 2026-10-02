@@ -64,12 +64,12 @@ public sealed class Obfuscation082AdvancedTests
         };
         options.DisableRule(Rule.BlockedCharacters);
         options.DisablePattern(Pattern.AsciiArt);
-        options.Reserve("mx", ReservedMatchMode.WholeIdentifier);
+        options.Reserve("ma", ReservedMatchMode.WholeIdentifier);
 
-        var result = new Checker(options).Check(@"|\/|><");
+        var result = new Checker(options).Check(@"|\/|4");
 
         Assert.True(result.IsReserved);
-        Assert.Equal("mx", result.MatchedValue);
+        Assert.Equal("ma", result.MatchedValue);
     }
 
     [Fact]
@@ -115,6 +115,69 @@ public sealed class Obfuscation082AdvancedTests
         Assert.True(result.IsReserved);
         Assert.Equal("legal", result.MatchedValue);
         Assert.Equal(MatchKind.Obfuscated, result.MatchKind);
+    }
+
+
+    [Fact]
+    public void MediumSupportsSelectedCurrencyStyleVisuals()
+    {
+        var options = new Options();
+        options.DisableRule(Rule.BlockedCharacters);
+        options.Reserve("euro", ReservedMatchMode.WholeIdentifier);
+
+        var result = new Checker(options).Check("€uro");
+
+        Assert.True(result.IsReserved);
+        Assert.Equal("euro", result.MatchedValue);
+        Assert.Equal(MatchKind.Obfuscated, result.MatchKind);
+    }
+
+    [Fact]
+    public void ExtremeAddsBroadLetterShapeEquivalenceWithoutChangingHigh()
+    {
+        var highOptions = new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.High
+        };
+        highOptions.Reserve("lima", ReservedMatchMode.WholeIdentifier);
+
+        var extremeOptions = new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.Extreme
+        };
+        extremeOptions.Reserve("lima", ReservedMatchMode.WholeIdentifier);
+
+        Assert.True(new Checker(highOptions).IsClaimable("iima"));
+
+        var result = new Checker(extremeOptions).Check("iima");
+        Assert.True(result.IsReserved);
+        Assert.Equal("lima", result.MatchedValue);
+    }
+
+    [Fact]
+    public void HighCanUseAPlainSubstitutionAsItsSingleEdit()
+    {
+        var options = new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.High
+        };
+        options.Reserve("veltrix", ReservedMatchMode.WholeIdentifier);
+
+        var result = new Checker(options).Check("veltrax");
+
+        Assert.True(result.IsReserved);
+        Assert.Equal("veltrix", result.MatchedValue);
+    }
+
+    [Fact]
+    public void EmptyCustomReservationIsIgnored()
+    {
+        var options = new Options();
+        options.AdditionalReserved.Add("   ");
+
+        var checker = new Checker(options);
+
+        Assert.True(checker.IsClaimable("ordinarycandidate"));
     }
 
     [Fact]
