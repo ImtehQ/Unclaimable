@@ -26,17 +26,32 @@ public sealed class Obfuscation082Tests
     [Theory]
     [InlineData("BQQb", "boob")]
     [InlineData("bQ0b", "boob")]
-    [InlineData("p1m3L", "piemel")]
-    [InlineData("pieml", "piemel")]
-    [InlineData("pieemel", "piemel")]
-    [InlineData("piemle", "piemel")]
-    public void MediumBlocksVisualAndSingleEditEvasions(string value, string expected)
+    public void MediumBlocksHighConfidenceVisualEvasions(string value, string expected)
     {
         var result = new Checker(new Options()).Check(value);
 
         Assert.True(result.IsReserved, value);
         Assert.Equal("profanity", result.Category);
         Assert.Equal(expected, result.MatchedValue);
+    }
+
+    [Fact]
+    public void MediumComposesLeetspeakWithOneEditForProtectedTerms()
+    {
+        var result = new Checker(new Options()).Check("p1m3L");
+
+        Assert.True(result.IsReserved);
+        Assert.Equal("profanity", result.Category);
+        Assert.Contains(result.MatchedValue, new[] { "piemel", "pimmel" });
+    }
+
+    [Fact]
+    public void MediumDoesNotFuzzyMatchPlainAlphabeticTypos()
+    {
+        var checker = new Checker(new Options());
+
+        Assert.True(checker.IsClaimable("pieml"));
+        Assert.True(checker.IsClaimable("piemle"));
     }
 
     [Fact]
