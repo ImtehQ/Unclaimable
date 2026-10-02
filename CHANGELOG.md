@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.8.2 - Unreleased
+
+> **Default-behavior note:** 0.8.2 strengthens obfuscation and evasion matching. The new `Options.ObfuscationSensitivity` defaults to `Medium`. Applications that need behavior closest to 0.8.1 can select `Low`; applications that deliberately prefer broader blocking can opt into `High` or `Extreme`.
+
+### Added
+
+- `ObfuscationSensitivity` with `Low`, `Medium`, `High`, and `Extreme` levels.
+- Default `Medium` protection for high-confidence visual substitutions, composed leetspeak/confusable attacks, and bounded repair of curated safe partial roots when actual obfuscation evidence is present.
+- Case-aware uppercase `Q` visual handling without globally treating ordinary lowercase `q` as `o`.
+- Selected visual substitutions such as `€ -> e`, `¢ -> c`, `§ -> s`, and `¥ -> y` at Medium.
+- High-sensitivity one-edit evasion matching for sufficiently long protected identifiers, including insertion, deletion, substitution, adjacent transposition, repeated inserted runs, and broader visual forms such as `rn -> m`, `vv -> w`, and `cl -> d`.
+- Extreme-sensitivity two-edit matching for longer protected identifiers plus broader letter-shape and multi-character ASCII-art equivalence.
+- Regression coverage for composed Unicode + ASCII obfuscation, separator composition, the former 32-candidate ceiling, and a dedicated false-positive audit for the default Medium policy.
+
+### Changed
+
+- Obfuscation matching now uses bounded protected-value traversal instead of depending on capped Cartesian candidate expansion. Ambiguous inputs are no longer silently limited by the old 32-candidate ceiling.
+- Recognized visual/leetspeak transformations can compose with Unicode-confusable normalization and bounded edits in one matching path.
+- Medium requires real obfuscation evidence before its edit allowance can complete a match. Plain alphabetic near-misses such as `pieml` and `piemle` remain claimable at the default level.
+- `Rule.ObfuscationMatching` remains authoritative: disabling that rule disables all sensitivity layers.
+- Existing `MatchKind` values are preserved; stronger matches continue to report through the existing obfuscation/partial diagnostics.
+
+### Compatibility
+
+- The Core, ASP.NET Core, Email, and Extended packages remain version-aligned at 0.8.2.
+- The 0.8.1 dataset snapshot is unchanged; 0.8.2 is a matching-engine hardening release rather than a dataset expansion.
+- The compatibility suite continues to validate the published 0.8.0 API/behavior baseline plus the supported ASP.NET Core target matrix and portable ecosystem consumers.
+
 ## 0.8.1 - 2026-10-02
 
 > **Default-behavior note:** 0.8.1 expands the localized profanity filters and enables multilingual profanity matching by default. Applications that intentionally scope profanity to selected languages should set `MultilingualProfanityMatching = false` and regression-test their real username corpus before upgrading.

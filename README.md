@@ -22,6 +22,28 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 0.8.1 extends the normal localized profanity filters and adds default-on multilingual profanity matching so changing languages cannot be used as a profanity bypass.
 
+## Next release: 0.8.2 — obfuscation hardening
+
+0.8.2 is prepared as the next patch release and is **not published yet**. It strengthens the matching engine against composed obfuscation while adding an explicit sensitivity control:
+
+```csharp
+var options = new Options
+{
+    ObfuscationSensitivity = ObfuscationSensitivity.Medium
+};
+```
+
+`Medium` remains the default. It blocks high-confidence visual/leetspeak/confusable combinations and can repair one edit for curated safe roots only when the input already contains real obfuscation evidence. Plain typo-like near misses stay claimable at the default level.
+
+| Sensitivity | Intended behavior |
+| --- | --- |
+| `Low` | closest to the 0.8.1 substitution model; no fuzzy edit matching |
+| `Medium` | default; high-confidence visual/composed obfuscation with tightly bounded repair |
+| `High` | broader visual equivalence plus one-edit evasion matching for sufficiently long protected values |
+| `Extreme` | broadest visual matching and up to two bounded edits for longer protected values |
+
+The matcher also removes the old 32-candidate expansion ceiling, supports composed Unicode + ASCII transformations, keeps uppercase `Q` visual matching case-aware, and adds broader High/Extreme evasions such as adjacent transpositions, inserted/deleted characters, repeated filler runs, and selected multi-character visual forms.
+
 ## 0.8.1: multilingual profanity hardening
 
 0.8.1 substantially expands Unclaimable's profanity protection and adds more control over how multilingual profanity filtering is applied.
@@ -305,7 +327,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 
 - Reserved-name protection across **23 built-in categories**
 - **11,630 filter entries** representing **11,404 category-unique values**
-- Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
+- Exact, compact, curated partial, sensitivity-controlled obfuscation/evasion, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
 - Default-on multilingual profanity matching across the localized profanity datasets under `Category.Profanity`
 - Per-category enable/disable controls

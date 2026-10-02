@@ -2,12 +2,12 @@
 
 Fast, dependency-free reserved username and identifier validation for .NET.
 
-**Package version: 0.8.1**
+**Package version: 0.8.2**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable --version 0.8.1
+dotnet add package Unclaimable --version 0.8.2
 ```
 
 ## Quick start
@@ -31,6 +31,30 @@ if (result.IsClaimable)
 The Core package targets `netstandard2.0` and is intended for portable application code. The 0.8.0 compatibility workflow compile-checks it in .NET MAUI, Blazor WebAssembly, WPF, Windows Forms, Console, Worker Service, Avalonia, and Uno Platform consumers.
 
 No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for the Core checker; NuGet resolves the portable asset automatically.
+
+## What's new in 0.8.2
+
+0.8.2 hardens the obfuscation engine and adds a configurable sensitivity level:
+
+```csharp
+var options = new Options
+{
+    ObfuscationSensitivity = ObfuscationSensitivity.Medium
+};
+```
+
+`Medium` is the default. It adds high-confidence visual matching, composed Unicode/leetspeak handling, and tightly bounded repair for curated safe roots when the candidate already contains genuine obfuscation evidence. Ordinary one-edit typos are deliberately left for `High`.
+
+| Sensitivity | Behavior |
+| --- | --- |
+| `Low` | closest to 0.8.1 behavior; classic leetspeak/confusables, no fuzzy edit matching |
+| `Medium` | default; high-confidence visual and composed obfuscation with guarded one-edit repair for curated roots |
+| `High` | broader visual forms and one-edit insertion/deletion/substitution/transposition matching for sufficiently long protected values |
+| `Extreme` | broadest visual forms and up to two bounded edits for longer protected values |
+
+The new matcher no longer depends on the former 32-candidate expansion cap. It can compose recognized transformations in one path, including selected Unicode confusables, leetspeak, separators, case-aware uppercase `Q` visual forms, and bounded edits.
+
+`Rule.ObfuscationMatching` still controls the feature globally. Disabling it disables the sensitivity layers as well.
 
 ## What's new in 0.8.1
 

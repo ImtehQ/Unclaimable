@@ -1,4 +1,4 @@
-# Configuring Unclaimable 0.8.1
+# Configuring Unclaimable 0.8.2
 
 This guide explains how to keep Unclaimable's strict defaults while making small, intentional exceptions for an application's naming rules.
 
@@ -20,7 +20,7 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.1 default keeps the 0.8.0 deny-first baseline and adds default-on multilingual profanity matching across the localized profanity datasets. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.2 default keeps the 0.8.0 deny-first baseline and the 0.8.1 multilingual profanity behavior, while adding `ObfuscationSensitivity.Medium` as the default obfuscation policy. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
 
 ### Add an application-specific reserved name
 
@@ -228,6 +228,36 @@ The uppercase-only pattern is skipped, but `ADMIN` still resolves to the reserve
 | Allow one Extended identity | `ExtendedOptions.AllowedIdentifiers` | one Extended registration |
 
 Prefer the narrowest API that expresses the application's actual rule.
+
+## Obfuscation sensitivity in 0.8.2
+
+`Options.ObfuscationSensitivity` controls how aggressively the reserved-name matcher treats visual and typo-style evasions:
+
+```csharp
+var options = new Options
+{
+    ObfuscationSensitivity = ObfuscationSensitivity.Medium
+};
+```
+
+| Level | Behavior |
+| --- | --- |
+| `Low` | closest to 0.8.1: classic leetspeak and selected confusables, without fuzzy edit matching |
+| `Medium` | default: high-confidence visual/composed obfuscation and guarded one-edit repair for curated safe roots |
+| `High` | broader visual forms plus one-edit insertion, deletion, substitution, adjacent transposition, and selected repeated-run/multi-character evasions |
+| `Extreme` | broadest visual forms and up to two bounded edits for longer protected values |
+
+Medium intentionally requires real obfuscation evidence before its edit allowance can complete a match. This keeps plain typo-like values such as `pieml` and `piemle` claimable at the default level while still blocking composed evasions such as leetspeak plus a missing character.
+
+The sensitivity value is captured when the `Checker` is constructed, like the other normal `Options` values.
+
+To disable the complete obfuscation layer rather than reducing sensitivity:
+
+```csharp
+options.DisableRule(Rule.ObfuscationMatching);
+```
+
+That rule remains authoritative over all four sensitivity levels.
 
 ## 0.8.1 multilingual profanity behavior
 
