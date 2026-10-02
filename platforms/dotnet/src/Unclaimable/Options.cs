@@ -129,7 +129,9 @@ public sealed partial class Options
     /// active for profanity regardless of this collection.
     /// </summary>
     public IReadOnlyCollection<Language> MultilingualProfanityLanguages =>
-        _multilingualProfanityLanguages ?? AllSupportedLanguages;
+        _multilingualProfanityLanguages is null
+            ? (IReadOnlyCollection<Language>)AllSupportedLanguages
+            : _multilingualProfanityLanguages;
 
     /// <summary>
     /// Replaces the default all-language multilingual profanity set with the supplied languages.
