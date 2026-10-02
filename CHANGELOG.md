@@ -27,6 +27,7 @@
 - The Core, ASP.NET Core, Email, and Extended packages remain version-aligned at 0.8.2.
 - The 0.8.1 dataset snapshot is unchanged; 0.8.2 is a matching-engine hardening release rather than a dataset expansion.
 - The compatibility suite continues to validate the published 0.8.0 API/behavior baseline plus the supported ASP.NET Core target matrix and portable ecosystem consumers.
+- Release-preparation CI passes **4,032 tests** with **98.11% production line coverage** (`2,797 / 2,851`) and **83.02% branch coverage**.
 
 ## 0.8.1 - 2026-10-02
 

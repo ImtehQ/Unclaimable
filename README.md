@@ -4,13 +4,13 @@
 </h1>
 
 [![build](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
-[![latest line coverage](https://img.shields.io/badge/latest%20line%20coverage-98.16%25-brightgreen.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
+[![latest line coverage](https://img.shields.io/badge/latest%20line%20coverage-98.11%25-brightgreen.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/Unclaimable.svg?label=nuget)](https://www.nuget.org/packages/Unclaimable)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Unclaimable.svg?label=downloads)](https://www.nuget.org/packages/Unclaimable)
 [![license](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
 [![target](https://img.shields.io/badge/.NET-netstandard2.0-512BD4.svg)](platforms/dotnet/src/Unclaimable/Unclaimable.csproj)
 
-Latest measured production line coverage: **98.16%**. Engineering target: **100%**; enforced CI minimum: **98%**.
+Latest measured production line coverage: **98.11%**. Engineering target: **100%**; enforced CI minimum: **98%**.
 
 **Strict, fast username and identifier validation for .NET.**
 
