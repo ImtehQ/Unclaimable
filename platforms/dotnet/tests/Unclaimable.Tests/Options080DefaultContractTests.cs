@@ -49,6 +49,7 @@ public sealed class Options080DefaultContractTests
         Assert.True(options.ProfanityMatching);
         Assert.False(options.ProfanityPartialMatching);
         Assert.True(options.ObfuscationMatching);
+        Assert.Equal(ObfuscationSensitivity.Medium, options.ObfuscationSensitivity);
         Assert.True(options.UnicodeConfusableMatching);
         Assert.False(options.AllowNumbers);
         Assert.False(options.AsciiOnly);
