@@ -1,0 +1,34 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "en",
+  "description": "High-confidence English explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "anus",
+    "anuses",
+    "arse",
+    "ass",
+    "breast",
+    "breasts",
+    "cock",
+    "cum",
+    "cunt",
+    "dick",
+    "fuck",
+    "pussy",
+    "tit",
+    "tits",
+    "wank"
+  ],
+  "partialValues": [
+    "boob",
+    "boobs",
+    "penis",
+    "penises",
+    "titties",
+    "vagina",
+    "vaginas",
+    "vulva",
+    "vulvas"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "de",
+  "description": "High-confidence German explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "titten",
+    "schwanz",
+    "schwengel",
+    "klöten",
+    "fotze",
+    "möse",
+    "fick",
+    "ficken",
+    "bumsen",
+    "wichse",
+    "wichsen"
+  ],
+  "partialValues": [
+    "pimmel"
+  ]
+}

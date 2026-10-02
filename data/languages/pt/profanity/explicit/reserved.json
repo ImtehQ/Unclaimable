@@ -1,0 +1,26 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "pt",
+  "description": "High-confidence Portuguese explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "pênis",
+    "ânus",
+    "seios",
+    "buceta",
+    "caralho",
+    "colhões",
+    "pica",
+    "xereca",
+    "xoxota",
+    "foda",
+    "foder",
+    "boquete",
+    "porra",
+    "punheta",
+    "esporra"
+  ],
+  "partialValues": [
+    "piroca"
+  ]
+}
