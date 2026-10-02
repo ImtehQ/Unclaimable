@@ -227,13 +227,15 @@ public sealed partial class Checker : IChecker
                 continue;
             }
 
-            if (entry.Language.HasValue && !options.Languages.Contains(entry.Language.Value))
+            var isProfanity = string.Equals(entry.Category, "profanity", StringComparison.Ordinal);
+            if (isProfanity && !profanityMatching)
             {
                 continue;
             }
 
-            var isProfanity = string.Equals(entry.Category, "profanity", StringComparison.Ordinal);
-            if (isProfanity && !profanityMatching)
+            if (entry.Language.HasValue
+                && !options.Languages.Contains(entry.Language.Value)
+                && !(isProfanity && options.MultilingualProfanityMatching))
             {
                 continue;
             }
