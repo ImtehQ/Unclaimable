@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "sv",
+  "description": "High-confidence Swedish explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "tutte",
+    "fitta",
+    "knulla",
+    "kuk",
+    "rövhål"
+  ],
+  "partialValues": [
+    "tuttar",
+    "bröst"
+  ]
+}

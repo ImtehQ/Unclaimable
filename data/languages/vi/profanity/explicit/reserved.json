@@ -1,0 +1,31 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "vi",
+  "description": "High-confidence Vietnamese explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "buồi",
+    "cặc",
+    "lồn",
+    "địt mẹ",
+    "đụ má"
+  ],
+  "partialValues": [
+    "dương vật",
+    "duong vat",
+    "dươngvật",
+    "duongvat",
+    "âm đạo",
+    "am dao",
+    "âmđạo",
+    "amdao",
+    "âm hộ",
+    "am ho",
+    "âmhộ",
+    "amho",
+    "hậu môn",
+    "hau mon",
+    "hậumôn",
+    "haumon"
+  ]
+}

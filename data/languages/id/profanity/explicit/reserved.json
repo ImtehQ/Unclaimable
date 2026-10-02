@@ -1,0 +1,14 @@
+{
+  "schema": 2,
+  "category": "profanity",
+  "language": "id",
+  "description": "High-confidence Indonesian explicit, sexual, and anatomical profanity added in 0.8.1. Low-collision entries may opt into curated partial matching.",
+  "values": [
+    "kontol",
+    "memek",
+    "ngentot"
+  ],
+  "partialValues": [
+    "payudara"
+  ]
+}
