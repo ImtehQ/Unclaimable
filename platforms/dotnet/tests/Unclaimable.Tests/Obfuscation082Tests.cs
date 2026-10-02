@@ -35,6 +35,23 @@ public sealed class Obfuscation082Tests
         Assert.Equal(expected, result.MatchedValue);
     }
 
+
+    [Fact]
+    public void MediumKeepsUppercaseQVisualMatchingWithoutFoldingLowercaseQ()
+    {
+        var options = new Options();
+        options.Reserve("cooper", ReservedMatchMode.WholeIdentifier);
+
+        var checker = new Checker(options);
+
+        var visual = checker.Check("cQoper");
+        Assert.True(visual.IsReserved);
+        Assert.Equal("cooper", visual.MatchedValue);
+
+        Assert.True(checker.IsClaimable("cqoper"));
+        Assert.True(checker.IsClaimable("bqqb"));
+    }
+
     [Fact]
     public void MediumComposesLeetspeakWithOneEditForProtectedTerms()
     {
