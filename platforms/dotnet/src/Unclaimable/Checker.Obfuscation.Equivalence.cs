@@ -44,6 +44,14 @@ public sealed partial class Checker
             return true;
         }
 
+        if (sensitivity >= ObfuscationSensitivity.Extreme
+            && ((source == 'i' && target == 'l')
+                || (source == 'l' && target == 'i')))
+        {
+            transformed = true;
+            return true;
+        }
+
         transformed = false;
         return false;
     }
