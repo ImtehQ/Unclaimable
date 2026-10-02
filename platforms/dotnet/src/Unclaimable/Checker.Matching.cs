@@ -202,6 +202,16 @@ public sealed partial class Checker
         out int? matchStartIndex,
         out int? matchLength)
     {
+        if (_obfuscationSensitivity <= ObfuscationSensitivity.Medium
+            && !HasDirectObfuscationPotential(value))
+        {
+            match = null;
+            matchKind = MatchKind.None;
+            matchStartIndex = null;
+            matchLength = null;
+            return false;
+        }
+
         var index = ResolveObfuscationIndex(exactEntries);
         var preserveNonCompactCharacters = _consistentCompactMatching && !_compactMatching;
 
