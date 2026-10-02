@@ -30,13 +30,30 @@ public sealed class Obfuscation082SensitivityTests
         {
             ObfuscationSensitivity = ObfuscationSensitivity.High
         };
-        options.Reserve("example", ReservedMatchMode.WholeIdentifier);
+        options.Reserve("veltrix", ReservedMatchMode.WholeIdentifier);
 
-        var result = new Checker(options).Check("exampl");
+        var result = new Checker(options).Check("veltri");
 
         Assert.True(result.IsReserved);
-        Assert.Equal("example", result.MatchedValue);
+        Assert.Equal("veltrix", result.MatchedValue);
         Assert.Equal("custom", result.Category);
+    }
+
+    [Theory]
+    [InlineData("pieml")]
+    [InlineData("pieemel")]
+    [InlineData("piemle")]
+    public void HighBlocksSingleEditAlphabeticEvasions(string value)
+    {
+        var options = new Options
+        {
+            ObfuscationSensitivity = ObfuscationSensitivity.High
+        };
+
+        var result = new Checker(options).Check(value);
+
+        Assert.True(result.IsReserved, value);
+        Assert.Equal("profanity", result.Category);
     }
 
     [Fact]
@@ -46,19 +63,19 @@ public sealed class Obfuscation082SensitivityTests
         {
             ObfuscationSensitivity = ObfuscationSensitivity.High
         };
-        highOptions.Reserve("example", ReservedMatchMode.WholeIdentifier);
+        highOptions.Reserve("zavtrix", ReservedMatchMode.WholeIdentifier);
 
         var extremeOptions = new Options
         {
             ObfuscationSensitivity = ObfuscationSensitivity.Extreme
         };
-        extremeOptions.Reserve("example", ReservedMatchMode.WholeIdentifier);
+        extremeOptions.Reserve("zavtrix", ReservedMatchMode.WholeIdentifier);
 
-        Assert.True(new Checker(highOptions).IsClaimable("exmpe"));
+        Assert.True(new Checker(highOptions).IsClaimable("zavti"));
 
-        var result = new Checker(extremeOptions).Check("exmpe");
+        var result = new Checker(extremeOptions).Check("zavti");
         Assert.True(result.IsReserved);
-        Assert.Equal("example", result.MatchedValue);
+        Assert.Equal("zavtrix", result.MatchedValue);
     }
 
     [Fact]
