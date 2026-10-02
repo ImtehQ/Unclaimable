@@ -2,12 +2,12 @@
 
 Email-address identity and protected-domain impersonation checks.
 
-**Package version: 0.8.1**
+**Package version: 0.8.2**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable.Email --version 0.8.1
+dotnet add package Unclaimable.Email --version 0.8.2
 ```
 
 ## Cross-platform app compatibility
@@ -33,9 +33,24 @@ var created = checker.CheckNewAddress("bluegarden@lidl.nl");
 
 The email local part is checked with an email-adapted Unclaimable policy. Domain checks are handled separately.
 
-In 0.8.1, local-part identity protection starts from the same Core defaults as the main checker, including default-on multilingual profanity matching across the localized profanity datasets: country, city, celebrity, nationality, currency, religion, landmark, event, award, fictional-character, franchise, profession, and military rules are enabled by default, while `Rule.Numbers` remains disabled. Email-specific syntax concerns are adjusted separately, so username-oriented length, whitespace, separator, blocked-character, and shape checks are not applied as ordinary username restrictions.
+In 0.8.2, local-part identity protection starts from the same Core defaults as the main checker, including default-on multilingual profanity matching across the localized profanity datasets: country, city, celebrity, nationality, currency, religion, landmark, event, award, fictional-character, franchise, profession, and military rules are enabled by default, while `Rule.Numbers` remains disabled. Email-specific syntax concerns are adjusted separately, so username-oriented length, whitespace, separator, blocked-character, and shape checks are not applied as ordinary username restrictions.
 
 ## Customize local-part identity checks
+
+### 0.8.2 local-part obfuscation sensitivity
+
+The local-part checker inherits Core's new sensitivity setting through `LocalPartOptions`:
+
+```csharp
+var options = new EmailOptions();
+
+options.LocalPartOptions.ObfuscationSensitivity =
+    ObfuscationSensitivity.High;
+```
+
+`Medium` is the Core default. This setting affects local-part reserved-identity matching only; protected-domain typo/confusable detection remains controlled by the Email-specific domain options.
+
+
 
 Email syntax and Core identity checks are separate. `EmailOptions.LocalPartOptions` exposes the Core `Options` used for the local part.
 

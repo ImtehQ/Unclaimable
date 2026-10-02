@@ -178,6 +178,14 @@ public sealed partial class Options
     public bool ObfuscationMatching { get; set; } = true;
 
     /// <summary>
+    /// Controls how aggressively obfuscation matching resolves visual substitutions and bounded evasion edits.
+    /// <see cref="ObfuscationSensitivity.Medium"/> is the default. Set <see cref="ObfuscationSensitivity.Low"/>
+    /// for behavior closest to the 0.8.1 substitution model, or use High/Extreme when missed evasions are
+    /// more costly than additional false positives.
+    /// </summary>
+    public ObfuscationSensitivity ObfuscationSensitivity { get; set; } = ObfuscationSensitivity.Medium;
+
+    /// <summary>
     /// Detect selected common Unicode lookalikes and diacritic-based impersonation forms.
     /// This is not a complete Unicode confusable implementation.
     /// Kept for compatibility; prefer disabling <see cref="Rule.UnicodeConfusableMatching"/>.

@@ -4,13 +4,13 @@
 </h1>
 
 [![build](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
-[![latest line coverage](https://img.shields.io/badge/latest%20line%20coverage-98.16%25-brightgreen.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
+[![latest line coverage](https://img.shields.io/badge/latest%20line%20coverage-98.11%25-brightgreen.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/Unclaimable.svg?label=nuget)](https://www.nuget.org/packages/Unclaimable)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Unclaimable.svg?label=downloads)](https://www.nuget.org/packages/Unclaimable)
 [![license](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
 [![target](https://img.shields.io/badge/.NET-netstandard2.0-512BD4.svg)](platforms/dotnet/src/Unclaimable/Unclaimable.csproj)
 
-Latest measured production line coverage: **98.16%**. Engineering target: **100%**; enforced CI minimum: **98%**.
+Latest measured production line coverage: **98.11%**. Engineering target: **100%**; enforced CI minimum: **98%**.
 
 **Strict, fast username and identifier validation for .NET.**
 
@@ -18,9 +18,31 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## Current release: 0.8.1 LTS
+## Current release: 0.8.2 LTS
 
-0.8.1 extends the normal localized profanity filters and adds default-on multilingual profanity matching so changing languages cannot be used as a profanity bypass.
+0.8.2 hardens obfuscation and evasion matching, adds configurable sensitivity levels, and removes the previous candidate-expansion ceiling while keeping the default policy deliberately conservative.
+
+## 0.8.2: obfuscation hardening
+
+0.8.2 strengthens the matching engine against composed obfuscation while adding an explicit sensitivity control:
+
+```csharp
+var options = new Options
+{
+    ObfuscationSensitivity = ObfuscationSensitivity.Medium
+};
+```
+
+`Medium` remains the default. It blocks high-confidence visual/leetspeak/confusable combinations and can repair one edit for curated safe roots only when the input already contains real obfuscation evidence. Plain typo-like near misses stay claimable at the default level.
+
+| Sensitivity | Intended behavior |
+| --- | --- |
+| `Low` | closest to the 0.8.1 substitution model; no fuzzy edit matching |
+| `Medium` | default; high-confidence visual/composed obfuscation with tightly bounded repair |
+| `High` | broader visual equivalence plus one-edit evasion matching for sufficiently long protected values |
+| `Extreme` | broadest visual matching and up to two bounded edits for longer protected values |
+
+The matcher also removes the old 32-candidate expansion ceiling, supports composed Unicode + ASCII transformations, keeps uppercase `Q` visual matching case-aware, and adds broader High/Extreme evasions such as adjacent transpositions, inserted/deleted characters, repeated filler runs, and selected multi-character visual forms.
 
 ## 0.8.1: multilingual profanity hardening
 
@@ -206,13 +228,13 @@ The repository contains three companion packages that share the same release ver
 
 ### Unclaimable.AspNetCore
 
-Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.1 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
+Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.2 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
 
 See [the ASP.NET Core package README](platforms/dotnet/src/Unclaimable.AspNetCore/README.NUGET.md).
 
 ### Unclaimable.Email
 
-Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.1 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
+Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.2 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
 
 See [the Email package README](platforms/dotnet/src/Unclaimable.Email/README.NUGET.md).
 
@@ -305,7 +327,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 
 - Reserved-name protection across **23 built-in categories**
 - **11,630 filter entries** representing **11,404 category-unique values**
-- Exact, compact, curated partial, obfuscation, and selected Unicode-confusable matching
+- Exact, compact, curated partial, sensitivity-controlled obfuscation/evasion, and selected Unicode-confusable matching
 - **15 localized language datasets** with English enabled by default
 - Default-on multilingual profanity matching across the localized profanity datasets under `Category.Profanity`
 - Per-category enable/disable controls
@@ -330,7 +352,7 @@ Generic words remain exact rather than broad substring roots: `vote` does not bl
 
 ### Application ecosystem compatibility
 
-The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.1 compatibility workflow compile-checks consumers for:
+The portable `netstandard2.0` packages — `Unclaimable`, `Unclaimable.Email`, and `Unclaimable.Extended` — are intended for reuse across modern .NET application models. The 0.8.2 compatibility workflow compile-checks consumers for:
 
 - .NET MAUI (Android);
 - Blazor WebAssembly;
@@ -346,10 +368,10 @@ Those application models use the same portable packages; there is no separate MA
 Install the current release:
 
 ```bash
-dotnet add package Unclaimable --version 0.8.1
-dotnet add package Unclaimable.AspNetCore --version 0.8.1
-dotnet add package Unclaimable.Email --version 0.8.1
-dotnet add package Unclaimable.Extended --version 0.8.1
+dotnet add package Unclaimable --version 0.8.2
+dotnet add package Unclaimable.AspNetCore --version 0.8.2
+dotnet add package Unclaimable.Email --version 0.8.2
+dotnet add package Unclaimable.Extended --version 0.8.2
 ```
 
 ## Quick start

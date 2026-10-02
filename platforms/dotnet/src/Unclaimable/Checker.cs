@@ -112,6 +112,7 @@ public sealed partial class Checker : IChecker
     private readonly bool _partialMatching;
     private readonly int _partialMatchMinimumLength;
     private readonly bool _obfuscationMatching;
+    private readonly ObfuscationSensitivity _obfuscationSensitivity;
     private readonly bool _unicodeConfusableMatching;
     private readonly bool _allowNumbers;
     private readonly bool _asciiOnly;
@@ -194,6 +195,13 @@ public sealed partial class Checker : IChecker
                 "RepeatedPatternMinimumLength must be at least 2.");
         }
 
+        if (!Enum.IsDefined(typeof(ObfuscationSensitivity), options.ObfuscationSensitivity))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(options.ObfuscationSensitivity),
+                "ObfuscationSensitivity must be a supported ObfuscationSensitivity value.");
+        }
+
         _policy = policy;
         CaptureExceptions(options);
         _enabledPatterns = options.EnabledPatterns;
@@ -211,6 +219,7 @@ public sealed partial class Checker : IChecker
         _partialMatching = options.PartialMatching && options.IsRuleEnabled(Rule.PartialMatching);
         _partialMatchMinimumLength = options.PartialMatchMinimumLength;
         _obfuscationMatching = options.ObfuscationMatching && options.IsRuleEnabled(Rule.ObfuscationMatching);
+        _obfuscationSensitivity = options.ObfuscationSensitivity;
         _unicodeConfusableMatching = options.UnicodeConfusableMatching && options.IsRuleEnabled(Rule.UnicodeConfusableMatching);
         _allowNumbers = options.AllowNumbers || !options.IsRuleEnabled(Rule.Numbers);
         _asciiOnly = options.AsciiOnly;
@@ -271,6 +280,10 @@ public sealed partial class Checker : IChecker
 
         _partialEntries.Sort((left, right) => right.Compact.Length.CompareTo(left.Compact.Length));
         _customPartialEntries.Sort((left, right) => right.Compact.Length.CompareTo(left.Compact.Length));
+
+        _mainObfuscationIndex = new ObfuscationIndex(_exact, _compact, _partialEntries);
+        _customObfuscationIndex = new ObfuscationIndex(_customExact, _customCompact, _customPartialEntries);
+        _identityObfuscationIndex = new ObfuscationIndex(_identityRuleExact, _identityRuleCompact, NoPartialEntries);
     }
 
     /// <summary>
@@ -342,6 +355,8 @@ public sealed partial class Checker : IChecker
         {
             return Result.Allowed(value);
         }
+
+        var obfuscationInput = NormalizeCaseAwareObfuscationInput(value, exact);
 
         var exactCustomResult = CheckExactCustomReservation(value, exact);
         if (exactCustomResult is not null)
@@ -429,7 +444,7 @@ public sealed partial class Checker : IChecker
             int? confusableStart;
             int? confusableLength;
             if (TryMatchUnicodeConfusable(
-                    exact,
+                    obfuscationInput,
                     out confusableMatch,
                     out confusableKind,
                     out confusableStart,
@@ -450,7 +465,7 @@ public sealed partial class Checker : IChecker
             int? obfuscatedStart;
             int? obfuscatedLength;
             if (TryMatchObfuscated(
-                    exact,
+                    obfuscationInput,
                     out obfuscatedMatch,
                     out obfuscatedKind,
                     out obfuscatedStart,

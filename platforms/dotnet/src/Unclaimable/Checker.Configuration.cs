@@ -189,6 +189,8 @@ public sealed partial class Checker
 
     private Result? CheckOptionalRuleReservation(string? value, string exact)
     {
+        var obfuscationInput = NormalizeCaseAwareObfuscationInput(value, exact);
+
         if (!IsRuleException(Rule.CountryNames, value)
             && _countryRuleExact.TryGetValue(exact, out var country))
         {
@@ -258,7 +260,7 @@ public sealed partial class Checker
         if (_unicodeConfusableMatching
             && !IsRuleException(Rule.UnicodeConfusableMatching, value)
             && TryMatchUnicodeConfusable(
-                exact,
+                obfuscationInput,
                 _identityRuleExact,
                 _identityRuleCompact,
                 NoPartialEntries,
@@ -282,7 +284,7 @@ public sealed partial class Checker
         if (_obfuscationMatching
             && !IsRuleException(Rule.ObfuscationMatching, value)
             && TryMatchObfuscated(
-                exact,
+                obfuscationInput,
                 _identityRuleExact,
                 _identityRuleCompact,
                 NoPartialEntries,
@@ -308,6 +310,8 @@ public sealed partial class Checker
 
     private Result? CheckCustomDefaultReservations(string? value, string exact)
     {
+        var obfuscationInput = NormalizeCaseAwareObfuscationInput(value, exact);
+
         if (_customExact.TryGetValue(exact, out var exactMatch))
         {
             var mapping = value is null ? null : TryCreateInputMapping(value, exact);
@@ -362,7 +366,7 @@ public sealed partial class Checker
 
         if (_unicodeConfusableMatching
             && TryMatchUnicodeConfusable(
-                exact,
+                obfuscationInput,
                 _customExact,
                 _customCompact,
                 _customPartialEntries,
@@ -376,7 +380,7 @@ public sealed partial class Checker
 
         if (_obfuscationMatching
             && TryMatchObfuscated(
-                exact,
+                obfuscationInput,
                 _customExact,
                 _customCompact,
                 _customPartialEntries,
