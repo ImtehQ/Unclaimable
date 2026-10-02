@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.2 - Unreleased
+## 0.8.2 - 2026-10-02
 
 > **Default-behavior note:** 0.8.2 strengthens obfuscation and evasion matching. The new `Options.ObfuscationSensitivity` defaults to `Medium`. Applications that need behavior closest to 0.8.1 can select `Low`; applications that deliberately prefer broader blocking can opt into `High` or `Extreme`.
 
