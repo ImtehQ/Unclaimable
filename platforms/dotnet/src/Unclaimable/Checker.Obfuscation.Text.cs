@@ -11,13 +11,6 @@ public sealed partial class Checker
         bool requireSourceEnd,
         out int endIndex)
     {
-        if (maxEdits > 0
-            && _obfuscationSensitivity == ObfuscationSensitivity.Medium
-            && !HasDirectObfuscationPotential(source))
-        {
-            maxEdits = 0;
-        }
-
         return TryMatchObfuscationTextCore(
             source,
             sourceStart,
