@@ -4,25 +4,25 @@ public sealed partial class Checker
 {
     private bool TryMatchObfuscationEditTransitions(
         string source, int si, string target, int ti, bool preserve,
-        int maxEdits, int edits, bool requireEnd, HashSet<long> failed,
+        int maxEdits, int edits, bool transformed, bool requireEnd, HashSet<long> failed,
         out int end)
     {
         if (TryNearMatchEdits(
                 source, si, target, ti, preserve,
-                maxEdits, edits, requireEnd, failed, out end))
+                maxEdits, edits, transformed, requireEnd, failed, out end))
         {
             return true;
         }
 
         if (TrySkipRepeatedRun(
                 source, si, target, ti, preserve,
-                maxEdits, edits, requireEnd, failed, out end))
+                maxEdits, edits, transformed, requireEnd, failed, out end))
         {
             return true;
         }
 
         return TryNearMatchTranspose(
-            source, si, target, ti, preserve, maxEdits, edits + 1,
+            source, si, target, ti, preserve, maxEdits, edits + 1, transformed,
             requireEnd, failed, out end);
     }
 }
