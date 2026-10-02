@@ -7,11 +7,12 @@
 ### Added
 
 - 174 high-confidence explicit, sexual, and anatomical profanity entries distributed across the normal profanity datasets for all 15 supported language families.
+- 300 additional exact-only profanity, vulgar-insult, obscene-expression, and sexual-slang entries across the eight smaller profanity filters: Polish, Turkish, Indonesian, Czech, Vietnamese, Hungarian, Swedish, and Romanian. Identity-targeting slurs remain intentionally excluded.
 - `Options.MultilingualProfanityMatching`, enabled by default. When enabled, profanity datasets from all supported languages participate even when those languages are not selected in `Options.Languages`. When disabled, profanity follows the selected language packs normally.
-- Regression coverage for all 174 expanded terms in both language-scoped and multilingual modes.
+- Regression coverage for all 174 explicit terms in both language-scoped and multilingual modes, plus a dataset-driven sweep that verifies every embedded profanity entry through multilingual mode.
 - Coverage proving the expanded terms use the existing exact, compact, curated partial, obfuscation/leetspeak, and Unicode-confusable pipeline, including `p3n1s`, `b00bs`, `v4g1n4`, `t1ts`, and wrapped forms such as `myb00bname` and `myp3n1sname`.
 - Forty-two low-collision explicit terms are curated partial roots so simple prefix/suffix wrapping does not bypass protection. Collision-prone short forms remain exact-only; examples such as `cocktail`, `penelope`, `janus`, and `dickens` remain claimable by this dataset.
-- Core dataset coverage increases from **11,150** to **11,324 filter entries** and from **11,039** to **11,108 category-unique values**. The category count remains **23**.
+- Core dataset coverage increases from the published 0.8.0 baseline of **11,156** to **11,630 filter entries** and from **11,039** to **11,404 category-unique values**. `Category.Profanity` grows from **861 / 848** entries/unique values to **1,335 / 1,213**. The category count remains **23**.
 
 ### Changed
 

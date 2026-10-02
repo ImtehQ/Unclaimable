@@ -34,11 +34,11 @@ No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for th
 
 ## Multilingual profanity hardening in 0.8.1
 
-`Category.Profanity` remains enabled by default. The 174 expanded high-confidence explicit, sexual, and anatomical terms live in their normal language profanity datasets.
+`Category.Profanity` remains enabled by default. The release adds 174 high-confidence explicit, sexual, and anatomical entries across all 15 language filters, plus 300 additional exact-only profanity and vulgar-expression entries across the eight smaller language filters.
 
 `MultilingualProfanityMatching` is enabled by default, so profanity from unselected language packs is also checked. Set it to `false` when profanity should follow only `Options.Languages`. English profanity therefore still works with the default English language selected, while Dutch profanity requires `Language.Dutch` when multilingual mode is disabled.
 
-The expanded entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline, so variants such as `p3n1s`, `b00bs`, and `v4g1n4` are covered by the existing matcher. Forty-two low-collision expanded terms are curated partial roots; collision-prone forms remain exact-only by default.
+The expanded entries use the normal exact, compact, obfuscation/leetspeak, and selected Unicode-confusable matching pipeline, so variants such as `p3n1s`, `b00bs`, and `v4g1n4` are covered by the existing matcher. Forty-two low-collision explicit terms are curated partial roots; the 300 broader language-filter additions are exact-only, and collision-prone forms remain exact-only by default.
 
 Disable profanity entirely with `options.DisableCategory(Category.Profanity)` or `options.DisableRule(Rule.Profanity)`. Broad, non-curated profanity substring matching remains opt-in through `ProfanityPartialMatching`.
 ## Strict defaults in 0.8.0

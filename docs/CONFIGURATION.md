@@ -287,6 +287,30 @@ options.DisableRule(Rule.Profanity);
 ```
 
 Forty-two low-collision expanded explicit terms are deliberately marked as curated partial roots, so wrapping those terms inside a larger identifier is blocked by default. Collision-prone short terms remain exact-only. `ProfanityPartialMatching` remains opt-in for broad substring matching of ordinary profanity entries.
+### Profanity coverage in 0.8.1
+
+The profanity filters now contain the following distinct values per language. These are per-language counts, so the same spelling appearing in more than one language is counted once in each relevant filter.
+
+| Language | Unique profanity values |
+| --- | ---: |
+| English | 311 |
+| Dutch | 130 |
+| German | 138 |
+| French | 55 |
+| Spanish | 55 |
+| Italian | 50 |
+| Portuguese | 59 |
+| Polish | 60 |
+| Turkish | 51 |
+| Indonesian | 45 |
+| Czech | 50 |
+| Vietnamese | 59 |
+| Hungarian | 53 |
+| Swedish | 58 |
+| Romanian | 56 |
+
+The eight previously smaller filters received **300 additional exact-only entries** in 0.8.1. Exact-only expansion improves whole-identifier coverage without turning short or common profanity terms into broad substring rules.
+
 ## 0.8.0 default behavior
 
 The 0.8.0 baseline is stricter than 0.7.8.
