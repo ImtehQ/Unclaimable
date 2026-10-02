@@ -213,7 +213,7 @@ public sealed class Obfuscation082AdvancedTests
     }
 
     [Theory]
-    [InlineData("securitx", "security")]
+    [InlineData("infosex", "security")]
     [InlineData("systen", "system")]
     public void HighAppliesSingleEditProtectionToSensitiveBuiltInCategories(
         string value,
