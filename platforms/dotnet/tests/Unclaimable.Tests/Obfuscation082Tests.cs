@@ -62,6 +62,17 @@ public sealed class Obfuscation082Tests
         Assert.Contains(result.MatchedValue, new[] { "piemel", "pimmel" });
     }
 
+
+    [Fact]
+    public void MediumRequiresRealObfuscationEvidenceBeforeUsingItsEditBudget()
+    {
+        var checker = new Checker(new Options());
+
+        // '7' is an obfuscation-capable character, but 7 -> l is not a recognized
+        // equivalence. Medium must not turn that ordinary typo into a fuzzy match.
+        Assert.True(checker.IsClaimable("pieme7"));
+    }
+
     [Fact]
     public void MediumDoesNotFuzzyMatchPlainAlphabeticTypos()
     {
