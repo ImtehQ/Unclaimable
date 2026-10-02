@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Xunit;
 
 namespace Unclaimable.Tests;
@@ -218,6 +219,36 @@ public sealed class Profanity081Tests
     }
 
     [Fact]
+    public void EveryProfanityDatasetEntryWorksInMultilingualMode()
+    {
+        var options = CreateProfanityOnlyOptions(multilingual: true);
+        options.DisablePattern(
+            Pattern.NumericOnly
+            | Pattern.Repeated
+            | Pattern.SymbolOnly
+            | Pattern.AsciiArt
+            | Pattern.UppercaseOnly);
+
+        var checker = new Checker(options);
+        var count = 0;
+
+        foreach (var value in ReadAllProfanityEntries())
+        {
+            var result = checker.Check(value);
+
+            Assert.True(
+                result.IsReserved && result.Category == "profanity",
+                $"Multilingual profanity missed '{value}' or classified it as {result.MatchKind}/{result.Category ?? "<none>"}.");
+            Assert.True(
+                result.MatchKind == MatchKind.Exact,
+                $"Expected exact profanity match for '{value}', got {result.MatchKind}.");
+            count++;
+        }
+
+        Assert.True(count >= 1300, $"Profanity sweep unexpectedly small: {count} entries.");
+    }
+
+    [Fact]
     public void DisablingMultilingualModeKeepsSelectedEnglishProfanityActive()
     {
         var options = new Options { MultilingualProfanityMatching = false };
@@ -362,6 +393,90 @@ public sealed class Profanity081Tests
         Assert.True(checker.IsClaimable("penis"));
         Assert.True(checker.IsClaimable("piemel"));
         Assert.True(checker.IsClaimable("godverdomme"));
+    }
+
+    private static IEnumerable<string> ReadAllProfanityEntries()
+    {
+        var assembly = typeof(Checker).Assembly;
+
+        foreach (var resourceName in assembly.GetManifestResourceNames()
+                     .Where(name => name.StartsWith("Unclaimable.Data.", StringComparison.Ordinal)
+                                    && name.EndsWith(".json", StringComparison.OrdinalIgnoreCase)))
+        {
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream is null)
+            {
+                continue;
+            }
+
+            using var document = JsonDocument.Parse(stream);
+            var root = document.RootElement;
+
+            if (!root.TryGetProperty("category", out var category)
+                || category.GetString() != "profanity")
+            {
+                continue;
+            }
+
+            if (root.TryGetProperty("values", out var values))
+            {
+                foreach (var value in values.EnumerateArray())
+                {
+                    var text = value.GetString();
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        yield return text;
+                    }
+                }
+            }
+
+            if (root.TryGetProperty("partialValues", out var partialValues))
+            {
+                foreach (var value in partialValues.EnumerateArray())
+                {
+                    var text = value.GetString();
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        yield return text;
+                    }
+                }
+            }
+
+            if (!root.TryGetProperty("combinations", out var combinations))
+            {
+                continue;
+            }
+
+            foreach (var combination in combinations.EnumerateArray())
+            {
+                if (!combination.TryGetProperty("roots", out var roots)
+                    || !combination.TryGetProperty("suffixes", out var suffixes))
+                {
+                    continue;
+                }
+
+                var suffixValues = suffixes
+                    .EnumerateArray()
+                    .Select(value => value.GetString())
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Cast<string>()
+                    .ToArray();
+
+                foreach (var rootValue in roots.EnumerateArray())
+                {
+                    var rootText = rootValue.GetString();
+                    if (string.IsNullOrWhiteSpace(rootText))
+                    {
+                        continue;
+                    }
+
+                    foreach (var suffix in suffixValues)
+                    {
+                        yield return rootText + suffix;
+                    }
+                }
+            }
+        }
     }
 
     private static Options CreateProfanityOnlyOptions(bool multilingual)
