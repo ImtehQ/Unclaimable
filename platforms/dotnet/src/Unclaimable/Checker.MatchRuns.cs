@@ -10,6 +10,7 @@ public sealed partial class Checker
         bool preserve,
         int maxEdits,
         int edits,
+        bool transformed,
         bool requireEnd,
         HashSet<long> failed,
         out int end)
@@ -36,7 +37,7 @@ public sealed partial class Checker
 
         return TryMatchObfuscationTextCore(
             source, next, target, targetIndex,
-            preserve, maxEdits, edits + 1, true,
+            preserve, maxEdits, edits + 1, transformed,
             requireEnd, failed, out end);
     }
 }
