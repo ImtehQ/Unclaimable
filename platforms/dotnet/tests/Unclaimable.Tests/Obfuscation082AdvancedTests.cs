@@ -62,6 +62,7 @@ public sealed class Obfuscation082AdvancedTests
         {
             ObfuscationSensitivity = ObfuscationSensitivity.Extreme
         };
+        DisableBuiltInReservations(options);
         options.DisableRule(Rule.BlockedCharacters);
         options.DisablePattern(Pattern.AsciiArt);
         options.Reserve("ma", ReservedMatchMode.WholeIdentifier);
@@ -139,12 +140,14 @@ public sealed class Obfuscation082AdvancedTests
         {
             ObfuscationSensitivity = ObfuscationSensitivity.High
         };
+        DisableBuiltInReservations(highOptions);
         highOptions.Reserve("lima", ReservedMatchMode.WholeIdentifier);
 
         var extremeOptions = new Options
         {
             ObfuscationSensitivity = ObfuscationSensitivity.Extreme
         };
+        DisableBuiltInReservations(extremeOptions);
         extremeOptions.Reserve("lima", ReservedMatchMode.WholeIdentifier);
 
         Assert.True(new Checker(highOptions).IsClaimable("iima"));
@@ -240,4 +243,27 @@ public sealed class Obfuscation082AdvancedTests
         Assert.True(result.IsReserved);
         Assert.Equal("profanity", result.Category);
     }
+    private static void DisableBuiltInReservations(Options options)
+    {
+        foreach (var category in Enum.GetValues<Category>())
+        {
+            options.DisableCategory(category);
+        }
+
+        options.DisableRule(
+            Rule.CountryNames |
+            Rule.PopularCityNames |
+            Rule.CelebrityNames |
+            Rule.Nationalities |
+            Rule.Currencies |
+            Rule.Religions |
+            Rule.Landmarks |
+            Rule.Events |
+            Rule.Awards |
+            Rule.FictionalCharacters |
+            Rule.Franchises |
+            Rule.Professions |
+            Rule.Military);
+    }
+
 }
