@@ -83,8 +83,8 @@ public sealed partial class Checker
         }
 
         return _obfuscationSensitivity >= ObfuscationSensitivity.High
-               && (value.Contains("rn", StringComparison.Ordinal)
-                   || value.Contains("vv", StringComparison.Ordinal)
-                   || value.Contains("cl", StringComparison.Ordinal));
+               && (value.IndexOf("rn", StringComparison.Ordinal) >= 0
+                   || value.IndexOf("vv", StringComparison.Ordinal) >= 0
+                   || value.IndexOf("cl", StringComparison.Ordinal) >= 0);
     }
 }
