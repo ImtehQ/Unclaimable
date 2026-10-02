@@ -2,7 +2,7 @@ namespace Unclaimable;
 
 public sealed partial class Checker
 {
-    private static bool TryFinishObfuscationMatch(
+    private bool TryFinishObfuscationMatch(
         string source,
         int sourceIndex,
         bool preserveNonCompactCharacters,
@@ -31,7 +31,8 @@ public sealed partial class Checker
             }
         }
 
-        if (transformed || editsUsed > 0)
+        var editOnlyMatchAllowed = _obfuscationSensitivity >= ObfuscationSensitivity.High;
+        if (transformed || (editOnlyMatchAllowed && editsUsed > 0))
         {
             endIndex = end;
             return true;
