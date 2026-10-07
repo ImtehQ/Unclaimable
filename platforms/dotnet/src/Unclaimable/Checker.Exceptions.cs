@@ -72,7 +72,7 @@ public sealed partial class Checker
     }
 
     private static string NormalizeExceptionIdentifier(string value) =>
-        value.Normalize(NormalizationForm.FormKC).ToLowerInvariant();
+        value.Trim().Normalize(NormalizationForm.FormKC).ToLowerInvariant();
 
     private static Rule? GetRuleForReservedEntry(ReservedEntry entry)
     {
