@@ -109,7 +109,11 @@ public sealed partial class Options
 
         foreach (var value in values)
         {
-            effective.Add(new ReservationRegistration(prefix + value, "custom", ReservedMatchMode.Exact));
+            effective.Add(new ReservationRegistration(
+                prefix + value,
+                "custom",
+                ReservedMatchMode.Exact,
+                isInternal: true));
         }
     }
 
