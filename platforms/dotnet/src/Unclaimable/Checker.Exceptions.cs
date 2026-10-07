@@ -47,29 +47,43 @@ public sealed partial class Checker
         }
     }
 
-    private bool IsRuleException(Rule rule, string? value)
+    private Rule GetRuleExceptions(string? value)
     {
-        if (value is null)
+        if (value is null || _ruleExceptions.Count == 0)
         {
-            return false;
+            return Rule.None;
         }
 
         var normalized = NormalizeExceptionIdentifier(value);
         return _ruleExceptions.TryGetValue(normalized, out var rules)
-               && (rules & rule) == rule;
+            ? rules
+            : Rule.None;
     }
 
-    private bool IsPatternException(Pattern pattern, string? value)
+    private Pattern GetPatternExceptions(string? value)
     {
-        if (value is null)
+        if (value is null || _patternExceptions.Count == 0)
         {
-            return false;
+            return Pattern.None;
         }
 
         var normalized = NormalizeExceptionIdentifier(value);
         return _patternExceptions.TryGetValue(normalized, out var patterns)
-               && (patterns & pattern) == pattern;
+            ? patterns
+            : Pattern.None;
     }
+
+    private static bool HasRuleException(Rule exceptions, Rule rule) =>
+        (exceptions & rule) == rule;
+
+    private static bool HasPatternException(Pattern exceptions, Pattern pattern) =>
+        (exceptions & pattern) == pattern;
+
+    private bool IsRuleException(Rule rule, string? value) =>
+        HasRuleException(GetRuleExceptions(value), rule);
+
+    private bool IsPatternException(Pattern pattern, string? value) =>
+        HasPatternException(GetPatternExceptions(value), pattern);
 
     private static string NormalizeExceptionIdentifier(string value) =>
         value.Trim().Normalize(NormalizationForm.FormKC).ToLowerInvariant();

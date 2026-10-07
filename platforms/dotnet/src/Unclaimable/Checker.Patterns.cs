@@ -20,31 +20,33 @@ public sealed partial class Checker
             return false;
         }
 
-        if (IsPatternEnabled(Pattern.NumericOnly) && !IsPatternException(Pattern.NumericOnly, value) && IsNumericOnlyPattern(patternText))
+        var patternExceptions = GetPatternExceptions(value);
+
+        if (IsPatternEnabled(Pattern.NumericOnly) && !HasPatternException(patternExceptions, Pattern.NumericOnly) && IsNumericOnlyPattern(patternText))
         {
             violation = CreatePatternResult(value!, MatchKind.NumericOnly);
             return true;
         }
 
-        if (IsPatternEnabled(Pattern.AsciiArt) && !IsPatternException(Pattern.AsciiArt, value) && IsAsciiArtPattern(patternText))
+        if (IsPatternEnabled(Pattern.AsciiArt) && !HasPatternException(patternExceptions, Pattern.AsciiArt) && IsAsciiArtPattern(patternText))
         {
             violation = CreatePatternResult(value!, MatchKind.AsciiArt);
             return true;
         }
 
-        if (IsPatternEnabled(Pattern.SymbolOnly) && !IsPatternException(Pattern.SymbolOnly, value) && IsSymbolOnlyPattern(patternText))
+        if (IsPatternEnabled(Pattern.SymbolOnly) && !HasPatternException(patternExceptions, Pattern.SymbolOnly) && IsSymbolOnlyPattern(patternText))
         {
             violation = CreatePatternResult(value!, MatchKind.SymbolOnly);
             return true;
         }
 
-        if (IsPatternEnabled(Pattern.Repeated) && !IsPatternException(Pattern.Repeated, value) && IsRepeatedPattern(patternText))
+        if (IsPatternEnabled(Pattern.Repeated) && !HasPatternException(patternExceptions, Pattern.Repeated) && IsRepeatedPattern(patternText))
         {
             violation = CreatePatternResult(value!, MatchKind.RepeatedPattern);
             return true;
         }
 
-        if (IsPatternEnabled(Pattern.UppercaseOnly) && !IsPatternException(Pattern.UppercaseOnly, value) && IsUppercaseOnlyPattern(patternText))
+        if (IsPatternEnabled(Pattern.UppercaseOnly) && !HasPatternException(patternExceptions, Pattern.UppercaseOnly) && IsUppercaseOnlyPattern(patternText))
         {
             violation = CreatePatternResult(value!, MatchKind.UppercaseOnly);
             return true;
@@ -64,27 +66,29 @@ public sealed partial class Checker
             return;
         }
 
-        if (IsPatternEnabled(Pattern.NumericOnly) && !IsPatternException(Pattern.NumericOnly, value) && IsNumericOnlyPattern(patternText))
+        var patternExceptions = GetPatternExceptions(value);
+
+        if (IsPatternEnabled(Pattern.NumericOnly) && !HasPatternException(patternExceptions, Pattern.NumericOnly) && IsNumericOnlyPattern(patternText))
         {
             AddPatternDiagnostic(MatchKind.NumericOnly, includeMessages, diagnostics);
         }
 
-        if (IsPatternEnabled(Pattern.AsciiArt) && !IsPatternException(Pattern.AsciiArt, value) && IsAsciiArtPattern(patternText))
+        if (IsPatternEnabled(Pattern.AsciiArt) && !HasPatternException(patternExceptions, Pattern.AsciiArt) && IsAsciiArtPattern(patternText))
         {
             AddPatternDiagnostic(MatchKind.AsciiArt, includeMessages, diagnostics);
         }
 
-        if (IsPatternEnabled(Pattern.SymbolOnly) && !IsPatternException(Pattern.SymbolOnly, value) && IsSymbolOnlyPattern(patternText))
+        if (IsPatternEnabled(Pattern.SymbolOnly) && !HasPatternException(patternExceptions, Pattern.SymbolOnly) && IsSymbolOnlyPattern(patternText))
         {
             AddPatternDiagnostic(MatchKind.SymbolOnly, includeMessages, diagnostics);
         }
 
-        if (IsPatternEnabled(Pattern.Repeated) && !IsPatternException(Pattern.Repeated, value) && IsRepeatedPattern(patternText))
+        if (IsPatternEnabled(Pattern.Repeated) && !HasPatternException(patternExceptions, Pattern.Repeated) && IsRepeatedPattern(patternText))
         {
             AddPatternDiagnostic(MatchKind.RepeatedPattern, includeMessages, diagnostics);
         }
 
-        if (IsPatternEnabled(Pattern.UppercaseOnly) && !IsPatternException(Pattern.UppercaseOnly, value) && IsUppercaseOnlyPattern(patternText))
+        if (IsPatternEnabled(Pattern.UppercaseOnly) && !HasPatternException(patternExceptions, Pattern.UppercaseOnly) && IsUppercaseOnlyPattern(patternText))
         {
             AddPatternDiagnostic(MatchKind.UppercaseOnly, includeMessages, diagnostics);
         }
