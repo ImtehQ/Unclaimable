@@ -7,7 +7,7 @@
 [![latest line coverage](https://img.shields.io/badge/latest%20line%20coverage-98.11%25-brightgreen.svg)](https://github.com/Perry3Dnl/Unclaimable/actions/workflows/dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/Unclaimable.svg?label=nuget)](https://www.nuget.org/packages/Unclaimable)
 [![NuGet downloads](https://img.shields.io/nuget/dt/Unclaimable.svg?label=downloads)](https://www.nuget.org/packages/Unclaimable)
-[![license](https://img.shields.io/badge/license-MPL--2.0-blue.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0%20%2B%20Commons%20Clause-blue.svg)](LICENSE)
 [![target](https://img.shields.io/badge/.NET-netstandard2.0-512BD4.svg)](platforms/dotnet/src/Unclaimable/Unclaimable.csproj)
 
 Latest measured production line coverage: **98.11%**. Engineering target: **100%**; enforced CI minimum: **98%**.
@@ -739,4 +739,10 @@ See [CHANGELOG.md](CHANGELOG.md) for older release history.
 
 ## License
 
-Unclaimable is licensed under the [Mozilla Public License 2.0](LICENSE).
+Starting with **0.8.3**, Unclaimable is source-available under the [Apache License 2.0 with the Commons Clause License Condition v1.0](LICENSE).
+
+You may use, modify, embed, and redistribute Unclaimable, including inside commercial applications and paid SaaS products. A larger product that uses Unclaimable may be sold. The restriction is on selling Unclaimable itself, or a product or service whose value derives entirely or substantially from Unclaimable's functionality.
+
+Copyright in Unclaimable remains with Perry3D.nl. Versions **0.8.2 and earlier** remain under the license attached to those releases; the 0.8.3 license change does not revoke earlier grants.
+
+Because the Commons Clause adds a commercial restriction, 0.8.3 and later are described as **source-available**, not OSI open source.

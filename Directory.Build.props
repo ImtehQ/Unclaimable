@@ -1,13 +1,13 @@
 <Project>
   <PropertyGroup>
-    <UnclaimableVersion>0.8.2</UnclaimableVersion>
+    <UnclaimableVersion>0.8.3</UnclaimableVersion>
 
     <Authors>Perry3D.nl</Authors>
     <Copyright>Copyright (c) 2026 Perry3D.nl</Copyright>
     <RepositoryUrl>https://github.com/Perry3Dnl/Unclaimable</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/Perry3Dnl/Unclaimable</PackageProjectUrl>
-    <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -17,4 +17,8 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="/" Link="LICENSE" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.8.3 - 2026-10-07
+
+> **Default-behavior note:** 0.8.3 narrows several collision-prone identity-list defaults while preserving the broader lists behind `Options.IncludeHighCollisionIdentityTerms`. It also corrects Unicode, email-domain, obfuscation, numeric-normalization, and scoped-exception behavior.
+
+### Fixed
+
+- Supplementary-plane combining marks are handled as complete Unicode scalars during confusable normalization, preventing malformed UTF-16 and `ArgumentException` failures in username and email-local-part checks.
+- Protected-domain detection now compares relevant DNS labels instead of applying edit distance to the complete domain. This catches lookalikes inside subdomains and embedded domains while avoiding prefix-label confusion such as treating `www` as the protected registrant identity.
+- Domain visual matching now composes the supported digit/leetspeak mappings with selected multi-character forms such as `rn -> m`, `vv -> w`, and `cl -> d`.
+- High-sensitivity obfuscation no longer removes an unlimited repeated run for a single edit; each inserted character consumes its own edit budget.
+- `Rule.Numbers` now recognizes digits that become decimal digits after Unicode compatibility normalization, including superscript and circled-number forms.
+- Scoped rule/pattern exception identifiers now use the same trimmed NFKC/case normalization as identifier matching.
+- User-defined exact reservations beginning with the internal reservation-prefix text remain literal user reservations instead of being interpreted as generated identity-list commands.
+- Built-in entries are deduplicated after exact normalization within each language. First-loaded diagnostic category precedence is preserved, while safe-partial participation is merged across duplicates.
+
+### Default identity-list refinement
+
+- Collision-heavy ordinary terms such as short currency codes/words, `ces`, common professions, and common military words are claimable by default.
+- Set `Options.IncludeHighCollisionIdentityTerms = true` to restore protection for that broader vocabulary without changing the enabled identity-rule flags.
+
+### Performance
+
+- Ordinary already-compact identifiers reuse their normalized string instead of allocating a second compact copy.
+- Common ASCII character-policy scans reuse cached scalar strings instead of allocating one-character strings repeatedly.
+- Obfuscation substitution tables are cached instead of allocating arrays during matching.
+- Protected-domain bounded edit matching no longer allocates dynamic-programming arrays per comparison.
+
+### Licensing
+
+- Starting with 0.8.3, Unclaimable is licensed under the Apache License 2.0 with the Commons Clause License Condition v1.0.
+- Unclaimable remains free to use, including inside commercial products and paid SaaS products, while resale of Unclaimable itself or a substantially equivalent standalone product/service is restricted.
+- 0.8.2 and earlier remain under their previously granted MPL-2.0 terms; the change is prospective only.
+- NuGet packages carry the complete `LICENSE` file and package validation verifies file-based license metadata.
+
 ## 0.8.2 - 2026-10-02
 
 > **Default-behavior note:** 0.8.2 strengthens obfuscation and evasion matching. The new `Options.ObfuscationSensitivity` defaults to `Medium`. Applications that need behavior closest to 0.8.1 can select `Low`; applications that deliberately prefer broader blocking can opt into `High` or `Extreme`.

@@ -108,7 +108,8 @@ foreach ($package in $packages) {
         $entryNames = @($archive.Entries | ForEach-Object { $_.FullName })
         $expectedEntries = @(
             "README.NUGET.md",
-            "unclaimable-icon.png"
+            "unclaimable-icon.png",
+            "LICENSE"
         )
 
         foreach ($framework in $frameworks) {
@@ -159,8 +160,8 @@ foreach ($package in $packages) {
 
         Assert-True ($idNode.InnerText -eq $id) "$id package metadata has the wrong package ID."
         Assert-True ($versionMetadataNode.InnerText -eq $version) "$id package metadata has version '$($versionMetadataNode.InnerText)' instead of '$version'."
-        Assert-True ($licenseNode.InnerText -eq "MPL-2.0") "$id package license expression is not MPL-2.0."
-        Assert-True ($licenseNode.GetAttribute("type") -eq "expression") "$id package license metadata is not an SPDX expression."
+        Assert-True ($licenseNode.InnerText -eq "LICENSE") "$id package license metadata does not reference LICENSE."
+        Assert-True ($licenseNode.GetAttribute("type") -eq "file") "$id package license metadata is not file-based."
         Assert-True ($copyrightNode.InnerText -eq "Copyright (c) 2026 Perry3D.nl") "$id package copyright metadata is incorrect."
         Assert-True ($readmeNode.InnerText -eq "README.NUGET.md") "$id package README metadata is incorrect."
         Assert-True ($iconNode.InnerText -eq "unclaimable-icon.png") "$id package icon metadata is incorrect."
