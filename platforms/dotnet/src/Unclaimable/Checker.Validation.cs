@@ -5,6 +5,7 @@ namespace Unclaimable;
 
 public sealed partial class Checker
 {
+    private static readonly string[] AsciiCharacterText = CreateAsciiCharacterText();
     private bool TryFindFirstPolicyViolation(string? value, out Result? violation)
     {
         violation = null;
@@ -57,17 +58,12 @@ public sealed partial class Checker
         for (var index = 0; index < value.Length; index++)
         {
             var character = value[index];
-            var characterText = character.ToString();
+            var characterText = GetScalarText(value, index);
             var category = CharUnicodeInfo.GetUnicodeCategory(value, index);
 
-            if (char.IsHighSurrogate(character)
-                && index + 1 < value.Length
-                && char.IsLowSurrogate(value[index + 1]))
-            {
-                characterText = new string(new[] { character, value[index + 1] });
-            }
-
-            if (!_allowNumbers && !IsRuleException(Rule.Numbers, value) && category == UnicodeCategory.DecimalDigitNumber)
+            if (!_allowNumbers
+                && !IsRuleException(Rule.Numbers, value)
+                && IsDecimalDigitAfterCompatibilityNormalization(characterText, category))
             {
                 violation = Result.NumbersNotAllowed(value, index, characterText);
                 return true;
@@ -109,15 +105,8 @@ public sealed partial class Checker
         for (var index = 0; index < value.Length; index++)
         {
             var character = value[index];
-            var characterText = character.ToString();
+            var characterText = GetScalarText(value, index);
             var category = CharUnicodeInfo.GetUnicodeCategory(value, index);
-
-            if (char.IsHighSurrogate(character)
-                && index + 1 < value.Length
-                && char.IsLowSurrogate(value[index + 1]))
-            {
-                characterText = new string(new[] { character, value[index + 1] });
-            }
 
             if (_rejectControlCharacters && category == UnicodeCategory.Control)
             {
@@ -203,15 +192,8 @@ public sealed partial class Checker
         for (var index = 0; index < value.Length; index++)
         {
             var character = value[index];
-            var characterText = character.ToString();
+            var characterText = GetScalarText(value, index);
             var category = CharUnicodeInfo.GetUnicodeCategory(value, index);
-
-            if (char.IsHighSurrogate(character)
-                && index + 1 < value.Length
-                && char.IsLowSurrogate(value[index + 1]))
-            {
-                characterText = new string(new[] { character, value[index + 1] });
-            }
 
             if (!IsInvisibleForApproximation(category, character))
             {
@@ -240,7 +222,9 @@ public sealed partial class Checker
                         : null));
             }
 
-            if (!_allowNumbers && !IsRuleException(Rule.Numbers, value) && category == UnicodeCategory.DecimalDigitNumber)
+            if (!_allowNumbers
+                && !IsRuleException(Rule.Numbers, value)
+                && IsDecimalDigitAfterCompatibilityNormalization(characterText, category))
             {
                 diagnostics.Add(new Diagnostic(
                     MatchKind.NumbersNotAllowed,
@@ -294,6 +278,66 @@ public sealed partial class Checker
                     ? "Value does not contain a Unicode scalar outside whitespace, control, format, or combining-mark categories."
                     : null));
         }
+    }
+
+    private static string[] CreateAsciiCharacterText()
+    {
+        var values = new string[128];
+        for (var index = 0; index < values.Length; index++)
+        {
+            values[index] = ((char)index).ToString();
+        }
+
+        return values;
+    }
+
+    private static string GetScalarText(string value, int index)
+    {
+        var character = value[index];
+        if (char.IsHighSurrogate(character)
+            && index + 1 < value.Length
+            && char.IsLowSurrogate(value[index + 1]))
+        {
+            return new string(new[] { character, value[index + 1] });
+        }
+
+        return character < AsciiCharacterText.Length
+            ? AsciiCharacterText[character]
+            : character.ToString();
+    }
+
+    private static bool IsDecimalDigitAfterCompatibilityNormalization(
+        string characterText,
+        UnicodeCategory category)
+    {
+        if (category == UnicodeCategory.DecimalDigitNumber)
+        {
+            return true;
+        }
+
+        if (category != UnicodeCategory.OtherNumber
+            && category != UnicodeCategory.LetterNumber)
+        {
+            return false;
+        }
+
+        var normalized = characterText.Normalize(NormalizationForm.FormKC);
+        for (var index = 0; index < normalized.Length; index++)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(normalized, index) == UnicodeCategory.DecimalDigitNumber)
+            {
+                return true;
+            }
+
+            if (char.IsHighSurrogate(normalized[index])
+                && index + 1 < normalized.Length
+                && char.IsLowSurrogate(normalized[index + 1]))
+            {
+                index++;
+            }
+        }
+
+        return false;
     }
 
     private static Diagnostic ToDiagnostic(Result result, bool includeMessage)
