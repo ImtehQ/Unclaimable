@@ -266,7 +266,7 @@ public sealed partial class Checker : IChecker
             var entry = new ReservedEntry(reservation.Value, reservation.Category);
             if (reservation.Matching == ReservedMatchMode.Exact)
             {
-                AddExactCustom(entry);
+                AddExactCustom(entry, reservation.IsInternal);
             }
             else
             {
