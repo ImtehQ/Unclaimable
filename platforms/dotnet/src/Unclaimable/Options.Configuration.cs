@@ -163,15 +163,21 @@ public sealed partial class Options
 
     internal sealed class ReservationRegistration
     {
-        internal ReservationRegistration(string value, string category, ReservedMatchMode matching)
+        internal ReservationRegistration(
+            string value,
+            string category,
+            ReservedMatchMode matching,
+            bool isInternal = false)
         {
             Value = value;
             Category = category;
             Matching = matching;
+            IsInternal = isInternal;
         }
 
         internal string Value { get; }
         internal string Category { get; }
         internal ReservedMatchMode Matching { get; }
+        internal bool IsInternal { get; }
     }
 }
