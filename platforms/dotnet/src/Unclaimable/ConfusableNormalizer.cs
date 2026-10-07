@@ -83,7 +83,14 @@ internal static class ConfusableNormalizer
             case '7': substitutions = T; return true;
             case '8': substitutions = B; return true;
             case '@': substitutions = A; return true;
-            case '
+            case '$': substitutions = S; return true;
+            case '!':
+            case '|': substitutions = IL; return true;
+            case '+': substitutions = T; return true;
+            default:
+                substitutions = null;
+                return false;
+        }
     }
 
     private static bool TryMapAsciiDomainConfusable(char character, out char mapped)
