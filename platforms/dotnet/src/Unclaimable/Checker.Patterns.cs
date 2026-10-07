@@ -103,7 +103,10 @@ public sealed partial class Checker
             return null;
         }
 
-        return value!.Trim().Normalize(NormalizationForm.FormKC);
+        var trimmed = value!.Trim();
+        return IsAsciiString(trimmed)
+            ? trimmed
+            : trimmed.Normalize(NormalizationForm.FormKC);
     }
 
     private static bool IsNumericOnlyPattern(string value)
@@ -187,6 +190,11 @@ public sealed partial class Checker
 
     private bool IsRepeatedPattern(string value)
     {
+        if (IsAsciiString(value))
+        {
+            return IsRepeatedAsciiPattern(value);
+        }
+
         var elements = new List<string>();
         var enumerator = StringInfo.GetTextElementEnumerator(value.ToLowerInvariant());
 
@@ -237,6 +245,104 @@ public sealed partial class Checker
 
         return false;
     }
+
+    private bool IsRepeatedAsciiPattern(string value)
+    {
+        var runLength = 1;
+
+        for (var index = 1; index < value.Length; index++)
+        {
+            var previous = FoldAscii(value[index - 1]);
+            var current = FoldAscii(value[index]);
+
+            if (previous == current)
+            {
+                runLength++;
+                if (runLength >= MinimumDirectRepeatElements
+                    && !_allowedRepeatedCharacters.Contains(AsciiCharacterText[current]))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                runLength = 1;
+            }
+        }
+
+        if (value.Length < _repeatedPatternMinimumLength)
+        {
+            return false;
+        }
+
+        for (var startIndex = 0; startIndex <= value.Length - _repeatedPatternMinimumLength; startIndex++)
+        {
+            var remaining = value.Length - startIndex;
+            var maximumUnitLength = Math.Min(MaximumRepeatedUnitElements, remaining / 2);
+
+            for (var unitLength = 2; unitLength <= maximumUnitLength; unitLength++)
+            {
+                if (RepeatedAsciiUnitIsUniform(value, startIndex, unitLength))
+                {
+                    continue;
+                }
+
+                var matchedLength = unitLength;
+                var nextUnitStart = startIndex + unitLength;
+
+                while (nextUnitStart + unitLength <= value.Length
+                       && RepeatedAsciiUnitMatches(value, startIndex, nextUnitStart, unitLength))
+                {
+                    matchedLength += unitLength;
+                    if (matchedLength >= _repeatedPatternMinimumLength)
+                    {
+                        return true;
+                    }
+
+                    nextUnitStart += unitLength;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool RepeatedAsciiUnitIsUniform(string value, int startIndex, int unitLength)
+    {
+        var first = FoldAscii(value[startIndex]);
+        for (var offset = 1; offset < unitLength; offset++)
+        {
+            if (first != FoldAscii(value[startIndex + offset]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool RepeatedAsciiUnitMatches(
+        string value,
+        int firstUnitStart,
+        int candidateUnitStart,
+        int unitLength)
+    {
+        for (var offset = 0; offset < unitLength; offset++)
+        {
+            if (FoldAscii(value[firstUnitStart + offset])
+                != FoldAscii(value[candidateUnitStart + offset]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static char FoldAscii(char character) =>
+        character >= 'A' && character <= 'Z'
+            ? (char)(character + ('a' - 'A'))
+            : character;
 
     private bool ContainsDirectRepeat(IReadOnlyList<string> elements)
     {
@@ -333,16 +439,31 @@ public sealed partial class Checker
 
     private static bool IsAsciiArtPattern(string value)
     {
-        var builder = new StringBuilder(value.Length);
-        foreach (var character in value)
+        var hasWhitespace = false;
+        for (var index = 0; index < value.Length; index++)
         {
-            if (!char.IsWhiteSpace(character))
+            if (char.IsWhiteSpace(value[index]))
             {
-                builder.Append(character);
+                hasWhitespace = true;
+                break;
             }
         }
 
-        var compact = builder.ToString();
+        var compact = value;
+        if (hasWhitespace)
+        {
+            var builder = new StringBuilder(value.Length);
+            foreach (var character in value)
+            {
+                if (!char.IsWhiteSpace(character))
+                {
+                    builder.Append(character);
+                }
+            }
+
+            compact = builder.ToString();
+        }
+
         if (compact.Length == 0)
         {
             return false;

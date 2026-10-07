@@ -13,7 +13,38 @@ public sealed partial class Checker
             return null;
         }
 
-        return value.Trim().Normalize(NormalizationForm.FormKC).ToLowerInvariant();
+        var trimmed = value.Trim();
+        if (IsAsciiString(trimmed))
+        {
+            var hasUppercase = false;
+            for (var index = 0; index < trimmed.Length; index++)
+            {
+                if (trimmed[index] >= 'A' && trimmed[index] <= 'Z')
+                {
+                    hasUppercase = true;
+                    break;
+                }
+            }
+
+            return hasUppercase
+                ? trimmed.ToLowerInvariant()
+                : trimmed;
+        }
+
+        return trimmed.Normalize(NormalizationForm.FormKC).ToLowerInvariant();
+    }
+
+    private static bool IsAsciiString(string value)
+    {
+        for (var index = 0; index < value.Length; index++)
+        {
+            if (value[index] > 0x7F)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static string NormalizeCompact(string value)

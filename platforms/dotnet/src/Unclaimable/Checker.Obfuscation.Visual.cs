@@ -9,7 +9,15 @@ public sealed partial class Checker
             return normalizedValue;
         }
 
-        var visual = originalValue.Trim().Normalize(System.Text.NormalizationForm.FormKC);
+        var trimmed = originalValue.Trim();
+        if (IsAsciiString(trimmed) && trimmed.IndexOf('Q') < 0)
+        {
+            return normalizedValue;
+        }
+
+        var visual = IsAsciiString(trimmed)
+            ? trimmed
+            : trimmed.Normalize(System.Text.NormalizationForm.FormKC);
         if (visual.IndexOf('Q') < 0)
         {
             return normalizedValue;
