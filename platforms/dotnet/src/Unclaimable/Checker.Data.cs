@@ -18,8 +18,37 @@ public sealed partial class Checker
 
     private static string NormalizeCompact(string value)
     {
-        var builder = new StringBuilder(value.Length);
+        var requiresCompaction = false;
+        for (var index = 0; index < value.Length; index++)
+        {
+            var character = value[index];
+            if (char.IsHighSurrogate(character)
+                && index + 1 < value.Length
+                && char.IsLowSurrogate(value[index + 1]))
+            {
+                if (!IsLetterOrDigit(CharUnicodeInfo.GetUnicodeCategory(value, index)))
+                {
+                    requiresCompaction = true;
+                    break;
+                }
 
+                index++;
+                continue;
+            }
+
+            if (!char.IsLetterOrDigit(character))
+            {
+                requiresCompaction = true;
+                break;
+            }
+        }
+
+        if (!requiresCompaction)
+        {
+            return value;
+        }
+
+        var builder = new StringBuilder(value.Length);
         for (var index = 0; index < value.Length; index++)
         {
             var character = value[index];
