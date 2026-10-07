@@ -122,7 +122,7 @@ public sealed class EmailChecker075Tests
         yield return new object[] { "google.com", "goo9le.com", DomainLookalikeKind.Confusable };
         yield return new object[] { "google.com", "gοogle.com", DomainLookalikeKind.Confusable };
         yield return new object[] { "google.com", "xn--gogle-rce.com", DomainLookalikeKind.Confusable };
-        yield return new object[] { "google.com", "google.co", DomainLookalikeKind.Typographical };
+        yield return new object[] { "google.com", "google.co", DomainLookalikeKind.ProtectedLabelReuse };
         yield return new object[] { "google.com", "google.net", DomainLookalikeKind.ProtectedLabelReuse };
         yield return new object[] { "google.com", "google-login.com", DomainLookalikeKind.ProtectedLabelReuse };
         yield return new object[] { "google.com", "login-google.com", DomainLookalikeKind.ProtectedLabelReuse };

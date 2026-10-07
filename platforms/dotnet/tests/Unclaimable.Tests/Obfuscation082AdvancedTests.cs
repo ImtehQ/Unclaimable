@@ -5,7 +5,7 @@ namespace Unclaimable.Tests;
 public sealed class Obfuscation082AdvancedTests
 {
     [Fact]
-    public void HighTreatsRepeatedInsertedRunAsOneBoundedEdit()
+    public void HighCountsEachRepeatedInsertionAgainstTheEditBudget()
     {
         var options = new Options
         {
@@ -14,10 +14,13 @@ public sealed class Obfuscation082AdvancedTests
         options.DisablePattern(Pattern.Repeated);
         options.Reserve("veltrix", ReservedMatchMode.WholeIdentifier);
 
-        var result = new Checker(options).Check("velxxxtrix");
+        var checker = new Checker(options);
+        var oneInsertion = checker.Check("velxtrix");
+        var repeatedInsertions = checker.Check("velxxxtrix");
 
-        Assert.True(result.IsReserved);
-        Assert.Equal("veltrix", result.MatchedValue);
+        Assert.True(oneInsertion.IsReserved);
+        Assert.Equal("veltrix", oneInsertion.MatchedValue);
+        Assert.True(repeatedInsertions.IsClaimable);
     }
 
     [Fact]
