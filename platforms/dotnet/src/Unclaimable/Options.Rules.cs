@@ -35,6 +35,13 @@ public sealed partial class Options
     private Rule _enabledOptionalRules = OptionalRules;
 
     /// <summary>
+    /// Gets or sets whether short or broadly reusable identity-list words are protected.
+    /// The default is false so ordinary words such as profession names, military ranks,
+    /// short currency symbols, and event abbreviations remain claimable.
+    /// </summary>
+    public bool IncludeHighCollisionIdentityTerms { get; set; }
+
+    /// <summary>
     /// Gets named identity-list rules currently enabled for newly constructed checkers.
     /// All built-in identity-list rules are enabled by default in 0.8.0 and later unless explicitly disabled.
     /// <see cref="Rule.Numbers"/> remains disabled by default.
@@ -109,6 +116,12 @@ public sealed partial class Options
 
         foreach (var value in values)
         {
+            if (!IncludeHighCollisionIdentityTerms
+                && OptionalIdentityData.IsHighCollisionValue(value))
+            {
+                continue;
+            }
+
             effective.Add(new ReservationRegistration(
                 prefix + value,
                 "custom",
