@@ -91,6 +91,7 @@ public sealed partial class Checker
     {
         var assembly = typeof(Checker).Assembly;
         var entries = new List<ReservedEntry>();
+        var normalizedEntryIndexes = new Dictionary<string, int>(StringComparer.Ordinal);
         var serializer = new DataContractJsonSerializer(typeof(ReservedListDocument));
 
         foreach (var resourceName in assembly.GetManifestResourceNames()
@@ -118,15 +119,35 @@ public sealed partial class Checker
 
                 var language = ResolveDatasetLanguage(document, resourceName);
 
-                entries.AddRange((document.Values ?? Array.Empty<string>())
-                    .Where(value => !string.IsNullOrWhiteSpace(value))
-                    .Select(value => new ReservedEntry(value, document.Category, language)));
+                foreach (var value in document.Values ?? Array.Empty<string>())
+                {
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        AddBuiltInEntry(
+                            entries,
+                            normalizedEntryIndexes,
+                            value,
+                            document.Category,
+                            language,
+                            safePartial: false);
+                    }
+                }
 
                 if (document.Schema >= 2)
                 {
-                    entries.AddRange((document.PartialValues ?? Array.Empty<string>())
-                        .Where(value => !string.IsNullOrWhiteSpace(value))
-                        .Select(value => new ReservedEntry(value, document.Category, language, safePartial: true)));
+                    foreach (var value in document.PartialValues ?? Array.Empty<string>())
+                    {
+                        if (!string.IsNullOrWhiteSpace(value))
+                        {
+                            AddBuiltInEntry(
+                                entries,
+                                normalizedEntryIndexes,
+                                value,
+                                document.Category,
+                                language,
+                                safePartial: true);
+                        }
+                    }
 
                     foreach (var combination in document.Combinations ?? Array.Empty<CombinationDocument>())
                     {
@@ -141,11 +162,13 @@ public sealed partial class Checker
                             foreach (var suffix in (combination.Suffixes ?? Array.Empty<string>())
                                          .Where(suffix => !string.IsNullOrWhiteSpace(suffix)))
                             {
-                                entries.Add(new ReservedEntry(
+                                AddBuiltInEntry(
+                                    entries,
+                                    normalizedEntryIndexes,
                                     root + suffix,
                                     document.Category,
                                     language,
-                                    safePartial: combination.Partial));
+                                    safePartial: combination.Partial);
                             }
                         }
                     }
@@ -154,6 +177,43 @@ public sealed partial class Checker
         }
 
         return entries;
+    }
+
+    private static void AddBuiltInEntry(
+        List<ReservedEntry> entries,
+        Dictionary<string, int> normalizedEntryIndexes,
+        string value,
+        string category,
+        Language? language,
+        bool safePartial)
+    {
+        var normalized = NormalizeExact(value);
+        if (normalized is null)
+        {
+            return;
+        }
+
+        var languageKey = language.HasValue
+            ? ((int)language.Value).ToString(CultureInfo.InvariantCulture)
+            : "global";
+        var key = languageKey + "\u001f" + normalized;
+
+        if (!normalizedEntryIndexes.TryGetValue(key, out var existingIndex))
+        {
+            normalizedEntryIndexes.Add(key, entries.Count);
+            entries.Add(new ReservedEntry(value, category, language, safePartial));
+            return;
+        }
+
+        var existing = entries[existingIndex];
+        if (safePartial && !existing.SafePartial)
+        {
+            entries[existingIndex] = new ReservedEntry(
+                existing.Value,
+                existing.Category,
+                existing.Language,
+                safePartial: true);
+        }
     }
 
     private static Language? ResolveDatasetLanguage(ReservedListDocument document, string resourceName)
