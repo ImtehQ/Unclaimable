@@ -1,7 +1,21 @@
+using System.Collections.Generic;
+
 namespace Unclaimable;
 
 internal static class OptionalIdentityData
 {
+    private static readonly HashSet<string> HighCollisionValues =
+        new HashSet<string>(StringComparer.Ordinal)
+        {
+            "try", "sol", "won", "eth", "dollar", "pound",
+            "ces",
+            "private", "major", "officer", "army", "navy",
+            "doctor", "nurse", "teacher", "police"
+        };
+
+    internal static bool IsHighCollisionValue(string value) =>
+        HighCollisionValues.Contains(value.Trim().ToLowerInvariant());
+
     internal const string NationalityPrefix = "__unclaimable_internal_nationality_rule__:";
     internal const string CurrencyPrefix = "__unclaimable_internal_currency_rule__:";
     internal const string ReligionPrefix = "__unclaimable_internal_religion_rule__:";
