@@ -14,13 +14,6 @@ public sealed partial class Checker
             return true;
         }
 
-        if (TrySkipRepeatedRun(
-                source, si, target, ti, preserve,
-                maxEdits, edits, transformed, requireEnd, failed, out end))
-        {
-            return true;
-        }
-
         return TryNearMatchTranspose(
             source, si, target, ti, preserve, maxEdits, edits + 1, transformed,
             requireEnd, failed, out end);
