@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -786,69 +785,93 @@ public sealed class EmailChecker : IEmailChecker
             out changed);
     }
 
-    private static bool IsWithinDamerauLevenshteinDistance(string left, string right, int maximumDistance)
+    private static bool IsWithinDamerauLevenshteinDistance(
+        string left,
+        string right,
+        int maximumDistance)
     {
         if (Math.Abs(left.Length - right.Length) > maximumDistance)
         {
             return false;
         }
 
-        var length = right.Length + 1;
-        var pool = ArrayPool<int>.Shared;
-        var previousPrevious = pool.Rent(length);
-        var previous = pool.Rent(length);
-        var current = pool.Rent(length);
-
-        try
-        {
-            for (var column = 0; column <= right.Length; column++)
-            {
-                previous[column] = column;
-            }
-
-            for (var row = 1; row <= left.Length; row++)
-            {
-                current[0] = row;
-                var rowMinimum = current[0];
-
-                for (var column = 1; column <= right.Length; column++)
-                {
-                    var substitutionCost = left[row - 1] == right[column - 1] ? 0 : 1;
-                    var deletion = previous[column] + 1;
-                    var insertion = current[column - 1] + 1;
-                    var substitution = previous[column - 1] + substitutionCost;
-                    var distance = Math.Min(Math.Min(deletion, insertion), substitution);
-
-                    if (row > 1
-                        && column > 1
-                        && left[row - 1] == right[column - 2]
-                        && left[row - 2] == right[column - 1])
-                    {
-                        distance = Math.Min(distance, previousPrevious[column - 2] + 1);
-                    }
-
-                    current[column] = distance;
-                    rowMinimum = Math.Min(rowMinimum, distance);
-                }
-
-                if (rowMinimum > maximumDistance)
-                {
-                    return false;
-                }
-
-                var temporary = previousPrevious;
-                previousPrevious = previous;
-                previous = current;
-                current = temporary;
-            }
-
-            return previous[right.Length] <= maximumDistance;
-        }
-        finally
-        {
-            pool.Return(previousPrevious);
-            pool.Return(previous);
-            pool.Return(current);
-        }
+        return IsWithinBoundedEditDistance(
+            left,
+            0,
+            right,
+            0,
+            maximumDistance);
     }
+
+    private static bool IsWithinBoundedEditDistance(
+        string left,
+        int leftIndex,
+        string right,
+        int rightIndex,
+        int editsRemaining)
+    {
+        while (leftIndex < left.Length
+               && rightIndex < right.Length
+               && left[leftIndex] == right[rightIndex])
+        {
+            leftIndex++;
+            rightIndex++;
+        }
+
+        if (leftIndex == left.Length || rightIndex == right.Length)
+        {
+            return Math.Abs(
+                (left.Length - leftIndex) - (right.Length - rightIndex))
+                <= editsRemaining;
+        }
+
+        if (editsRemaining == 0)
+        {
+            return false;
+        }
+
+        var nextBudget = editsRemaining - 1;
+
+        if (IsWithinBoundedEditDistance(
+                left,
+                leftIndex + 1,
+                right,
+                rightIndex + 1,
+                nextBudget))
+        {
+            return true;
+        }
+
+        if (IsWithinBoundedEditDistance(
+                left,
+                leftIndex + 1,
+                right,
+                rightIndex,
+                nextBudget))
+        {
+            return true;
+        }
+
+        if (IsWithinBoundedEditDistance(
+                left,
+                leftIndex,
+                right,
+                rightIndex + 1,
+                nextBudget))
+        {
+            return true;
+        }
+
+        return leftIndex + 1 < left.Length
+               && rightIndex + 1 < right.Length
+               && left[leftIndex] == right[rightIndex + 1]
+               && left[leftIndex + 1] == right[rightIndex]
+               && IsWithinBoundedEditDistance(
+                   left,
+                   leftIndex + 2,
+                   right,
+                   rightIndex + 2,
+                   nextBudget);
+    }
+
 }
