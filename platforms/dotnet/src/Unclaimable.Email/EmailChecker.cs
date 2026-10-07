@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -27,17 +28,16 @@ public sealed class EmailChecker : IEmailChecker
 
     private sealed class ProtectedDomain
     {
-        public ProtectedDomain(string domain, string skeleton)
+        public ProtectedDomain(string domain)
         {
             Domain = domain;
-            Skeleton = skeleton;
-
-            RegistrantLabel = domain.Substring(0, domain.IndexOf('.'));
+            RegistrantLabel = GetRegistrantLabel(domain);
+            RegistrantSkeleton = CreateNormalizedDomainSkeleton(RegistrantLabel);
         }
 
         public string Domain { get; }
-        public string Skeleton { get; }
         public string RegistrantLabel { get; }
+        public string RegistrantSkeleton { get; }
     }
 
     private sealed class DomainAssessment
@@ -212,16 +212,29 @@ public sealed class EmailChecker : IEmailChecker
             }
         }
 
+        var candidateLabels = normalizedDomain.Split('.');
+
         if (_detectUnicodeLookalikes)
         {
-            var candidateSkeleton = CreateNormalizedDomainSkeleton(normalizedDomain);
             foreach (var protectedDomain in _protectedDomains)
             {
-                if (string.Equals(candidateSkeleton, protectedDomain.Skeleton, StringComparison.Ordinal))
+                for (var labelIndex = 0; labelIndex < candidateLabels.Length; labelIndex++)
                 {
-                    return new DomainAssessment(
-                        DomainLookalikeKind.Confusable,
-                        protectedDomain.Domain);
+                    var candidateLabel = candidateLabels[labelIndex];
+                    if (string.Equals(candidateLabel, protectedDomain.RegistrantLabel, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    if (AreDomainLabelsVisuallyEquivalent(
+                        candidateLabel,
+                        protectedDomain.RegistrantLabel,
+                        protectedDomain.RegistrantSkeleton))
+                    {
+                        return new DomainAssessment(
+                            DomainLookalikeKind.Confusable,
+                            protectedDomain.Domain);
+                    }
                 }
             }
         }
@@ -230,14 +243,23 @@ public sealed class EmailChecker : IEmailChecker
         {
             foreach (var protectedDomain in _protectedDomains)
             {
-                if (IsWithinDamerauLevenshteinDistance(
-                    normalizedDomain,
-                    protectedDomain.Domain,
-                    _maximumDomainEditDistance))
+                for (var labelIndex = 0; labelIndex < candidateLabels.Length; labelIndex++)
                 {
-                    return new DomainAssessment(
-                        DomainLookalikeKind.Typographical,
-                        protectedDomain.Domain);
+                    var candidateLabel = candidateLabels[labelIndex];
+                    if (string.Equals(candidateLabel, protectedDomain.RegistrantLabel, StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    if (IsWithinDamerauLevenshteinDistance(
+                        candidateLabel,
+                        protectedDomain.RegistrantLabel,
+                        _maximumDomainEditDistance))
+                    {
+                        return new DomainAssessment(
+                            DomainLookalikeKind.Typographical,
+                            protectedDomain.Domain);
+                    }
                 }
             }
         }
@@ -465,9 +487,7 @@ public sealed class EmailChecker : IEmailChecker
 
             if (!destination.ContainsKey(normalized))
             {
-                destination.Add(
-                    normalized,
-                    new ProtectedDomain(normalized, CreateNormalizedDomainSkeleton(normalized)));
+                destination.Add(normalized, new ProtectedDomain(normalized));
             }
         }
     }
@@ -599,6 +619,133 @@ public sealed class EmailChecker : IEmailChecker
                 && candidate.EndsWith("." + configuredDomain, StringComparison.Ordinal));
     }
 
+    private static string GetRegistrantLabel(string domain)
+    {
+        var labels = domain.Split('.');
+        var labelIndex = labels.Length - 2;
+
+        if (labels.Length >= 3 && IsCommonSecondLevelPublicSuffix(labels[labels.Length - 2], labels[labels.Length - 1]))
+        {
+            labelIndex--;
+        }
+
+        return labels[labelIndex];
+    }
+
+    private static bool IsCommonSecondLevelPublicSuffix(string secondLevel, string topLevel)
+    {
+        var suffix = secondLevel + "." + topLevel;
+        switch (suffix)
+        {
+            case "co.uk":
+            case "org.uk":
+            case "gov.uk":
+            case "ac.uk":
+            case "com.au":
+            case "net.au":
+            case "org.au":
+            case "co.nz":
+            case "co.jp":
+            case "com.br":
+            case "com.mx":
+            case "com.sg":
+            case "com.tr":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static bool AreDomainLabelsVisuallyEquivalent(
+        string candidateLabel,
+        string protectedLabel,
+        string protectedSkeleton)
+    {
+        var candidateUnicode = new IdnMapping().GetUnicode(candidateLabel);
+        bool changed;
+        var candidateSkeleton = global::Unclaimable.ConfusableNormalizer.CreateSkeleton(
+            candidateUnicode,
+            includeAsciiObfuscation: false,
+            out changed);
+
+        if (string.Equals(candidateSkeleton, protectedSkeleton, StringComparison.Ordinal))
+        {
+            return changed || !string.Equals(candidateLabel, protectedLabel, StringComparison.Ordinal);
+        }
+
+        return TryMatchDomainVisual(candidateSkeleton, 0, protectedSkeleton, 0);
+    }
+
+    private static bool TryMatchDomainVisual(string candidate, int candidateIndex, string target, int targetIndex)
+    {
+        while (candidateIndex < candidate.Length && targetIndex < target.Length)
+        {
+            var candidateCharacter = candidate[candidateIndex];
+            var targetCharacter = target[targetIndex];
+
+            if (candidateCharacter == targetCharacter)
+            {
+                candidateIndex++;
+                targetIndex++;
+                continue;
+            }
+
+            string[]? substitutions;
+            if (global::Unclaimable.ConfusableNormalizer.TryGetObfuscationSubstitutions(
+                    candidateCharacter,
+                    out substitutions))
+            {
+                for (var index = 0; index < substitutions!.Length; index++)
+                {
+                    if (substitutions[index].Length == 1
+                        && substitutions[index][0] == targetCharacter)
+                    {
+                        candidateIndex++;
+                        targetIndex++;
+                        goto ContinueMatching;
+                    }
+                }
+            }
+
+            if (targetCharacter == 'm'
+                && candidateIndex + 1 < candidate.Length
+                && candidate[candidateIndex] == 'r'
+                && candidate[candidateIndex + 1] == 'n')
+            {
+                candidateIndex += 2;
+                targetIndex++;
+                continue;
+            }
+
+            if (targetCharacter == 'w'
+                && candidateIndex + 1 < candidate.Length
+                && candidate[candidateIndex] == 'v'
+                && candidate[candidateIndex + 1] == 'v')
+            {
+                candidateIndex += 2;
+                targetIndex++;
+                continue;
+            }
+
+            if (targetCharacter == 'd'
+                && candidateIndex + 1 < candidate.Length
+                && candidate[candidateIndex] == 'c'
+                && candidate[candidateIndex + 1] == 'l')
+            {
+                candidateIndex += 2;
+                targetIndex++;
+                continue;
+            }
+
+            return false;
+
+        ContinueMatching:
+            continue;
+        }
+
+        return candidateIndex == candidate.Length && targetIndex == target.Length;
+    }
+
     private static bool ReusesProtectedRegistrantLabel(string candidateDomain, string protectedLabel)
     {
         if (protectedLabel.Length < 3)
@@ -646,44 +793,62 @@ public sealed class EmailChecker : IEmailChecker
             return false;
         }
 
-        var previousPrevious = new int[right.Length + 1];
-        var previous = new int[right.Length + 1];
-        var current = new int[right.Length + 1];
+        var length = right.Length + 1;
+        var pool = ArrayPool<int>.Shared;
+        var previousPrevious = pool.Rent(length);
+        var previous = pool.Rent(length);
+        var current = pool.Rent(length);
 
-        for (var column = 0; column <= right.Length; column++)
+        try
         {
-            previous[column] = column;
-        }
-
-        for (var row = 1; row <= left.Length; row++)
-        {
-            current[0] = row;
-
-            for (var column = 1; column <= right.Length; column++)
+            for (var column = 0; column <= right.Length; column++)
             {
-                var substitutionCost = left[row - 1] == right[column - 1] ? 0 : 1;
-                var deletion = previous[column] + 1;
-                var insertion = current[column - 1] + 1;
-                var substitution = previous[column - 1] + substitutionCost;
-                var distance = Math.Min(Math.Min(deletion, insertion), substitution);
-
-                if (row > 1
-                    && column > 1
-                    && left[row - 1] == right[column - 2]
-                    && left[row - 2] == right[column - 1])
-                {
-                    distance = Math.Min(distance, previousPrevious[column - 2] + 1);
-                }
-
-                current[column] = distance;
+                previous[column] = column;
             }
 
-            var temporary = previousPrevious;
-            previousPrevious = previous;
-            previous = current;
-            current = temporary;
-        }
+            for (var row = 1; row <= left.Length; row++)
+            {
+                current[0] = row;
+                var rowMinimum = current[0];
 
-        return previous[right.Length] <= maximumDistance;
+                for (var column = 1; column <= right.Length; column++)
+                {
+                    var substitutionCost = left[row - 1] == right[column - 1] ? 0 : 1;
+                    var deletion = previous[column] + 1;
+                    var insertion = current[column - 1] + 1;
+                    var substitution = previous[column - 1] + substitutionCost;
+                    var distance = Math.Min(Math.Min(deletion, insertion), substitution);
+
+                    if (row > 1
+                        && column > 1
+                        && left[row - 1] == right[column - 2]
+                        && left[row - 2] == right[column - 1])
+                    {
+                        distance = Math.Min(distance, previousPrevious[column - 2] + 1);
+                    }
+
+                    current[column] = distance;
+                    rowMinimum = Math.Min(rowMinimum, distance);
+                }
+
+                if (rowMinimum > maximumDistance)
+                {
+                    return false;
+                }
+
+                var temporary = previousPrevious;
+                previousPrevious = previous;
+                previous = current;
+                current = temporary;
+            }
+
+            return previous[right.Length] <= maximumDistance;
+        }
+        finally
+        {
+            pool.Return(previousPrevious);
+            pool.Return(previous);
+            pool.Return(current);
+        }
     }
 }
