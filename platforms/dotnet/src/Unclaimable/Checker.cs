@@ -231,6 +231,12 @@ public sealed partial class Checker : IChecker
 
         foreach (var entry in BuiltInEntries.Value)
         {
+            if (!options.IncludeHighCollisionIdentityTerms
+                && OptionalIdentityData.IsHighCollisionValue(entry.Value))
+            {
+                continue;
+            }
+
             if (!options.IsCategoryEnabled(entry.Category))
             {
                 continue;
