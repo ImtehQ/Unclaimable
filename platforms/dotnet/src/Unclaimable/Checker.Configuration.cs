@@ -55,9 +55,9 @@ public sealed partial class Checker
         }
     }
 
-    private void AddExactCustom(ReservedEntry entry)
+    private void AddExactCustom(ReservedEntry entry, bool isInternal)
     {
-        if (TryAddOptionalRuleReservation(entry.Value))
+        if (isInternal && TryAddOptionalRuleReservation(entry.Value))
         {
             return;
         }
