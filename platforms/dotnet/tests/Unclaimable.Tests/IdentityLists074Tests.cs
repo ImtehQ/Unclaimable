@@ -202,7 +202,10 @@ public sealed class IdentityLists074Tests
 
     private static Options CreateIdentityOnlyOptions(Rule enabledRules)
     {
-        var options = new Options();
+        var options = new Options
+        {
+            IncludeHighCollisionIdentityTerms = true
+        };
         options.DisableRule(AllOptionalRules & ~enabledRules);
 
         foreach (var category in Enum.GetValues<Category>())
