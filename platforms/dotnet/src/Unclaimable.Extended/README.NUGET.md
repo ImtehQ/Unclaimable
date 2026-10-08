@@ -2,12 +2,12 @@
 
 Large optional reserved-identity datasets for Unclaimable.
 
-**Package version: 0.8.2**
+**Package version: 0.8.3**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable.Extended --version 0.8.2
+dotnet add package Unclaimable.Extended --version 0.8.3
 ```
 
 Installing the package alone does not change validation behavior. Enable the data explicitly.
@@ -32,7 +32,7 @@ var checker = new Checker(options);
 
 All Extended groups are enabled after opt-in.
 
-The checker still uses the normal 0.8.2 Core defaults at the same time. Extended data is additive: opting in does not disable or replace country, city, celebrity, identity, structural, matching, or pattern rules that are already active in `Options`.
+The checker still uses the normal 0.8.3 Core defaults at the same time, including the lower-collision default treatment for generic Core identity vocabulary. Extended data remains explicitly opt-in and additive: enabling it does not disable or replace Core structural, matching, pattern, or identity rules already active in `Options`.
 
 ## Select categories
 
@@ -108,7 +108,7 @@ The initial Extended snapshot contains **36,313 additional identifiers**:
 
 Extended entries use `ReservedMatchMode.WholeIdentifier`.
 
-That means exact, compact, selected Unicode-confusable, and sensitivity-controlled obfuscation checks still apply, while these large identity datasets do **not** become arbitrary substring roots. In 0.8.2 they use the same Core `ObfuscationSensitivity` setting as other whole-identifier reservations; `Medium` remains the default.
+That means exact, compact, selected Unicode-confusable, and sensitivity-controlled obfuscation checks still apply, while these large identity datasets do **not** become arbitrary substring roots. In 0.8.3 they use the same Core `ObfuscationSensitivity` setting as other whole-identifier reservations; `Medium` remains the default. The 0.8.3 runtime matching and allocation optimizations also apply to these whole-identifier reservations.
 
 Core entries are indexed first. If an Extended identity is already protected by Core, the existing Core match and category remain authoritative.
 

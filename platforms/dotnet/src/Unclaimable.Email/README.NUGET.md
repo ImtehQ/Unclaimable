@@ -2,12 +2,12 @@
 
 Email-address identity and protected-domain impersonation checks.
 
-**Package version: 0.8.2**
+**Package version: 0.8.3**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable.Email --version 0.8.2
+dotnet add package Unclaimable.Email --version 0.8.3
 ```
 
 ## Cross-platform app compatibility
@@ -33,11 +33,11 @@ var created = checker.CheckNewAddress("bluegarden@lidl.nl");
 
 The email local part is checked with an email-adapted Unclaimable policy. Domain checks are handled separately.
 
-In 0.8.2, local-part identity protection starts from the same Core defaults as the main checker, including default-on multilingual profanity matching across the localized profanity datasets: country, city, celebrity, nationality, currency, religion, landmark, event, award, fictional-character, franchise, profession, and military rules are enabled by default, while `Rule.Numbers` remains disabled. Email-specific syntax concerns are adjusted separately, so username-oriented length, whitespace, separator, blocked-character, and shape checks are not applied as ordinary username restrictions.
+In 0.8.3, local-part identity protection starts from the same Core defaults as the main checker, including default-on multilingual profanity matching. Identity-rule flags remain enabled, while collision-heavy generic profession, military, currency, and event terms are claimable unless `LocalPartOptions.IncludeHighCollisionIdentityTerms` is enabled. `Rule.Numbers` remains disabled by default. Email-specific syntax concerns are adjusted separately, so username-oriented length, whitespace, separator, blocked-character, and shape checks are not applied as ordinary username restrictions.
 
 ## Customize local-part identity checks
 
-### 0.8.2 local-part obfuscation sensitivity
+### 0.8.3 local-part identity and obfuscation controls
 
 The local-part checker inherits Core's new sensitivity setting through `LocalPartOptions`:
 
@@ -105,6 +105,8 @@ Protected-domain matching checks:
 4. Selected Unicode and ASCII confusables.
 5. Bounded Damerau-Levenshtein typo distance, including adjacent transpositions.
 6. Protected registrant-label reuse on other TLDs or lure labels.
+
+0.8.3 applies typo/confusable comparison to the relevant DNS labels instead of treating the complete domain as one edit-distance string. It also recognizes the supported domain visual substitutions, including selected multi-character lookalikes, without confusing service prefixes such as `www` with the protected registrant identity.
 
 The default maximum typo distance is `1`.
 
