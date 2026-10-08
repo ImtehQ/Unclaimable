@@ -7,6 +7,7 @@ public sealed partial class Checker
         IReadOnlyList<PartialEntry> partialEntries,
         bool preserveNonCompactCharacters,
         bool directPotential,
+        HashSet<long> failedStates,
         out ReservedEntry? match,
         out int? matchStartIndex,
         out int? matchLength)
@@ -36,6 +37,7 @@ public sealed partial class Checker
                         preserveNonCompactCharacters,
                         editBudget,
                         requireSourceEnd: false,
+                        failedStates,
                         out endIndex))
                 {
                     continue;

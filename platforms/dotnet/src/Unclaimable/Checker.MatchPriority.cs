@@ -14,6 +14,7 @@ public sealed partial class Checker
         var entries = preserveNonCompactCharacters
             ? index.ExactEntries
             : index.CompactEntries;
+        var failedStates = new HashSet<long>();
 
         foreach (var pair in entries)
         {
@@ -25,7 +26,7 @@ public sealed partial class Checker
 
             int end;
             if (!TryMatchObfuscationText(
-                    value, 0, pair.Key, preserveNonCompactCharacters, 0, true, out end))
+                    value, 0, pair.Key, preserveNonCompactCharacters, 0, true, failedStates, out end))
             {
                 continue;
             }
@@ -52,7 +53,7 @@ public sealed partial class Checker
                     int end;
                     if (!TryMatchObfuscationText(
                             value, sourceStart, target,
-                            preserveNonCompactCharacters, 0, false, out end))
+                            preserveNonCompactCharacters, 0, false, failedStates, out end))
                     {
                         continue;
                     }

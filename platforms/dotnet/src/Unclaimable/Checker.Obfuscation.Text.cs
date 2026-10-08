@@ -9,8 +9,11 @@ public sealed partial class Checker
         bool preserveNonCompactCharacters,
         int maxEdits,
         bool requireSourceEnd,
+        HashSet<long> failed,
         out int endIndex)
     {
+        failed.Clear();
+
         return TryMatchObfuscationTextCore(
             source,
             sourceStart,
@@ -21,7 +24,7 @@ public sealed partial class Checker
             0,
             false,
             requireSourceEnd,
-            new HashSet<long>(),
+            failed,
             out endIndex);
     }
 }

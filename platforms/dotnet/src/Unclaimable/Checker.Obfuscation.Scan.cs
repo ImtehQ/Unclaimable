@@ -16,6 +16,7 @@ public sealed partial class Checker
             : index.CompactEntries;
 
         var directPotential = HasDirectObfuscationPotential(value);
+        var failedStates = new HashSet<long>();
 
         if (directPotential
             && TryMatchZeroCostObfuscation(
@@ -56,6 +57,7 @@ public sealed partial class Checker
                     preserveNonCompactCharacters,
                     editBudget,
                     requireSourceEnd: true,
+                    failedStates,
                     out endIndex))
             {
                 continue;
@@ -74,6 +76,7 @@ public sealed partial class Checker
                 index.PartialEntries,
                 preserveNonCompactCharacters,
                 directPotential,
+                failedStates,
                 out match,
                 out matchStartIndex,
                 out matchLength))
