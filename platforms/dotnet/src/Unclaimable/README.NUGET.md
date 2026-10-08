@@ -2,12 +2,12 @@
 
 Fast, dependency-free reserved username and identifier validation for .NET.
 
-**Package version: 0.8.2**
+**Package version: 0.8.3**
 
 ## Install
 
 ```bash
-dotnet add package Unclaimable --version 0.8.2
+dotnet add package Unclaimable --version 0.8.3
 ```
 
 ## Quick start
@@ -31,6 +31,23 @@ if (result.IsClaimable)
 The Core package targets `netstandard2.0` and is intended for portable application code. The 0.8.0 compatibility workflow compile-checks it in .NET MAUI, Blazor WebAssembly, WPF, Windows Forms, Console, Worker Service, Avalonia, and Uno Platform consumers.
 
 No MAUI-, Blazor-, Avalonia-, or Uno-specific adapter package is required for the Core checker; NuGet resolves the portable asset automatically.
+
+## What's new in 0.8.3
+
+0.8.3 is a correctness and performance hardening release. It fixes supplementary Unicode combining-mark handling, compatibility-normalized number detection, scoped exception normalization, repeated-run edit accounting, internal reservation-prefix collisions, and normalized duplicate loading.
+
+It also reduces default identity-list false positives. Collision-heavy profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations are claimable by default while the identity-rule flags remain enabled.
+
+```csharp
+var options = new Options
+{
+    IncludeHighCollisionIdentityTerms = true
+};
+```
+
+Enable that switch only when the application intentionally wants the broader identity vocabulary.
+
+The hot path also avoids several unnecessary allocations for ordinary ASCII identifiers, exception lookups, compact matching, and obfuscation substitutions.
 
 ## What's new in 0.8.2
 
