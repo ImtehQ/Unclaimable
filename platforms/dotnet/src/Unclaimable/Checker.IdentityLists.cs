@@ -10,6 +10,12 @@ internal static class OptionalIdentityData
             "dollar", "pound", "rand", "sterling"
         };
 
+    private static readonly HashSet<string> HighCollisionCrossCategoryWords =
+        new HashSet<string>(StringComparer.Ordinal)
+        {
+            "private", "officer"
+        };
+
     internal static bool IsHighCollisionValue(string value, Rule rule)
     {
         var normalized = value.Trim().ToLowerInvariant();
@@ -29,24 +35,8 @@ internal static class OptionalIdentityData
         }
     }
 
-    internal static bool IsHighCollisionValue(string value)
-    {
-        var normalized = value.Trim().ToLowerInvariant();
-
-        if (Array.IndexOf(Professions, normalized) >= 0
-            || Array.IndexOf(Military, normalized) >= 0)
-        {
-            return true;
-        }
-
-        if (normalized.Length <= 3 && Array.IndexOf(Currencies, normalized) >= 0)
-        {
-            return true;
-        }
-
-        return HighCollisionCurrencyWords.Contains(normalized)
-            || string.Equals(normalized, "ces", StringComparison.Ordinal);
-    }
+    internal static bool IsHighCollisionValue(string value) =>
+        HighCollisionCrossCategoryWords.Contains(value.Trim().ToLowerInvariant());
 
     internal static bool IsHighCollisionValue(string value, string category)
     {
