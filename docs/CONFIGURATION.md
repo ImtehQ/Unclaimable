@@ -1,4 +1,4 @@
-# Configuring Unclaimable 0.8.2
+# Configuring Unclaimable 0.8.3
 
 This guide explains how to keep Unclaimable's strict defaults while making small, intentional exceptions for an application's naming rules.
 
@@ -20,7 +20,22 @@ if (result.IsClaimable)
 }
 ```
 
-The 0.8.2 default keeps the 0.8.0 deny-first baseline and the 0.8.1 multilingual profanity behavior, while adding `ObfuscationSensitivity.Medium` as the default obfuscation policy. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+The 0.8.3 default keeps the deny-first pipeline, multilingual profanity behavior, and `ObfuscationSensitivity.Medium`, while reducing false positives from collision-heavy optional identity vocabulary. Every enabled check is a deny check: passing one check never clears the identifier. The value is claimable only when no enabled check rejects it.
+
+### High-collision identity vocabulary
+
+The protected identity rule flags remain enabled by default, but 0.8.3 filters collision-heavy generic terms from the default reservation set. This includes common profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations.
+
+Applications that intentionally want the broader identity lists can opt back in:
+
+```csharp
+var options = new Options
+{
+    IncludeHighCollisionIdentityTerms = true
+};
+```
+
+This is a vocabulary switch, not a rule switch. For example, `Rule.Professions` can remain enabled while its collision-heavy generic terms are omitted from the default checker.
 
 ### Add an application-specific reserved name
 
