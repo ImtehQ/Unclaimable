@@ -20,6 +20,25 @@ internal static class ConfusableNormalizer
         bool includeAsciiObfuscation,
         out bool changed)
     {
+        if (!includeAsciiObfuscation)
+        {
+            var allAscii = true;
+            for (var index = 0; index < value.Length; index++)
+            {
+                if (value[index] > 0x7F)
+                {
+                    allAscii = false;
+                    break;
+                }
+            }
+
+            if (allAscii)
+            {
+                changed = false;
+                return value;
+            }
+        }
+
         var decomposed = value.Normalize(NormalizationForm.FormD);
         var builder = new StringBuilder(decomposed.Length);
         changed = false;
