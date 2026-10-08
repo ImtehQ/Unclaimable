@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.3 - 2026-10-07
+## 0.8.3 - Unreleased
 
 > **Default-behavior note:** 0.8.3 narrows several collision-prone identity-list defaults while preserving the broader lists behind `Options.IncludeHighCollisionIdentityTerms`. It also corrects Unicode, email-domain, obfuscation, numeric-normalization, and scoped-exception behavior.
 
@@ -23,14 +23,21 @@
 ### Performance
 
 - Ordinary already-compact identifiers reuse their normalized string instead of allocating a second compact copy.
-- Common ASCII character-policy scans reuse cached scalar strings instead of allocating one-character strings repeatedly.
-- Obfuscation substitution tables are cached instead of allocating arrays during matching.
+- Common ASCII policy and confusable checks use fast paths that avoid unnecessary normalization and one-character allocations.
+- Obfuscation substitution tables are cached, impossible High/Extreme near-match lengths are pruned before recursion, and recursion-state storage is reused across protected candidates.
 - Protected-domain bounded edit matching no longer allocates dynamic-programming arrays per comparison.
+- A representative BenchmarkDotNet comparison against 0.8.2 reduced allocations from **1.98 KB to 144 B** for an ordinary accepted Core check, **13.68 KB to 696 B** for an obfuscation hit, and **470.66 KB to 1.8 KB** for the High near-match miss regression case. The ordinary and obfuscation cases were also faster in that run; the corrected High miss remained somewhat slower in CPU time while allocating over 99% less memory.
+
+### Verification
+
+- Release-preparation CI passes **4,091 tests** with **98.06% production line coverage** (`3,081 / 3,142`) and **83.61% branch coverage**.
+- The frozen 0.8.0 behavioral/API compatibility suite and the supported ecosystem compatibility matrix pass.
+- Core, ASP.NET Core, Email, and Extended 0.8.3 packages pass package-content/metadata validation, including the packaged `LICENSE`, and the packaged-consumer smoke test passes.
 
 ### Licensing
 
 - Starting with 0.8.3, Unclaimable is licensed under the Apache License 2.0 with the Commons Clause License Condition v1.0.
-- Unclaimable remains free to use, including inside commercial products and paid SaaS products, while resale of Unclaimable itself or a substantially equivalent standalone product/service is restricted.
+- Unclaimable remains free to use, including as an embedded component of commercial products and value-added paid SaaS products, while selling Unclaimable itself or a product/service whose value derives entirely or substantially from Unclaimable's functionality is restricted.
 - 0.8.2 and earlier remain under their previously granted MPL-2.0 terms; the change is prospective only.
 - NuGet packages carry the complete `LICENSE` file and package validation verifies file-based license metadata.
 
