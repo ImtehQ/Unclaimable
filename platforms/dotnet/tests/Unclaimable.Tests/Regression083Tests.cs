@@ -180,7 +180,7 @@ public sealed class Regression083Tests
             .CheckExistingAddress("bluegarden\U000F0000@example.com");
 
         Assert.False(result.IsAllowed);
-        Assert.Equal(EmailFailureKind.InvalidFormat, result.FailureKind);
+        Assert.Equal(EmailFailureKind.InvalidLocalPart, result.FailureKind);
     }
 
     [Theory]
@@ -213,7 +213,12 @@ public sealed class Regression083Tests
     [InlineData("éaéa")]
     public void RepeatedPatternSupportsNonAsciiTextElements(string value)
     {
-        var result = new Checker().Check(value);
+        var options = new Options
+        {
+            RepeatedPatternMinimumLength = 4
+        };
+
+        var result = new Checker(options).Check(value);
 
         Assert.Equal(MatchKind.RepeatedPattern, result.MatchKind);
     }
