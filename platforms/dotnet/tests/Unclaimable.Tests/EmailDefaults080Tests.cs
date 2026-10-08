@@ -34,19 +34,40 @@ public sealed class EmailDefaults080Tests
             options.LocalPartOptions.DisabledRules & V080ProtectedIdentityRules);
     }
 
-    [Theory]
-    [InlineData("amsterdam@example.com", MatchKind.PopularCityName)]
-    [InlineData("physician@example.com", MatchKind.Exact)]
-    public void EmailLocalPartAppliesDefaultProtectedIdentityRules(
-        string address,
-        MatchKind expectedMatchKind)
+    [Fact]
+    public void EmailLocalPartStillAppliesLowCollisionProtectedIdentityRulesByDefault()
     {
-        var result = new EmailChecker().CheckExistingAddress(address);
+        var result = new EmailChecker()
+            .CheckExistingAddress("amsterdam@example.com");
 
         Assert.False(result.IsAllowed);
         Assert.Equal(EmailFailureKind.ReservedLocalPart, result.FailureKind);
         Assert.NotNull(result.LocalPartResult);
-        Assert.Equal(expectedMatchKind, result.LocalPartResult!.MatchKind);
+        Assert.Equal(MatchKind.PopularCityName, result.LocalPartResult!.MatchKind);
+    }
+
+    [Fact]
+    public void EmailLocalPartAllowsHighCollisionIdentityTermsByDefault()
+    {
+        var result = new EmailChecker()
+            .CheckExistingAddress("physician@example.com");
+
+        Assert.True(result.IsAllowed);
+    }
+
+    [Fact]
+    public void EmailLocalPartCanOptBackIntoHighCollisionIdentityTerms()
+    {
+        var options = new EmailOptions();
+        options.LocalPartOptions.IncludeHighCollisionIdentityTerms = true;
+
+        var result = new EmailChecker(options)
+            .CheckExistingAddress("physician@example.com");
+
+        Assert.False(result.IsAllowed);
+        Assert.Equal(EmailFailureKind.ReservedLocalPart, result.FailureKind);
+        Assert.NotNull(result.LocalPartResult);
+        Assert.Equal(MatchKind.Exact, result.LocalPartResult!.MatchKind);
     }
 
     [Fact]

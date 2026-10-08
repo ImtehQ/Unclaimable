@@ -29,10 +29,30 @@ internal static class OptionalIdentityData
         }
     }
 
+    internal static bool IsHighCollisionValue(string value)
+    {
+        var normalized = value.Trim().ToLowerInvariant();
+
+        if (Array.IndexOf(Professions, normalized) >= 0
+            || Array.IndexOf(Military, normalized) >= 0)
+        {
+            return true;
+        }
+
+        if (normalized.Length <= 3 && Array.IndexOf(Currencies, normalized) >= 0)
+        {
+            return true;
+        }
+
+        return HighCollisionCurrencyWords.Contains(normalized)
+            || string.Equals(normalized, "ces", StringComparison.Ordinal);
+    }
+
     internal static bool IsHighCollisionValue(string value, string category)
     {
         var rule = GetRuleForCategory(category);
-        return rule.HasValue && IsHighCollisionValue(value, rule.Value);
+        return (rule.HasValue && IsHighCollisionValue(value, rule.Value))
+            || IsHighCollisionValue(value);
     }
 
     private static Rule? GetRuleForCategory(string category)
