@@ -6,6 +6,7 @@ public sealed partial class Checker
         string value,
         ObfuscationIndex index,
         bool preserveNonCompactCharacters,
+        HashSet<long> failedStates,
         out ReservedEntry? match,
         out MatchKind kind,
         out int? start,
@@ -14,7 +15,6 @@ public sealed partial class Checker
         var entries = preserveNonCompactCharacters
             ? index.ExactEntries
             : index.CompactEntries;
-        var failedStates = new HashSet<long>();
 
         foreach (var pair in entries)
         {

@@ -23,6 +23,7 @@ public sealed partial class Checker
                 value,
                 index,
                 preserveNonCompactCharacters,
+                failedStates,
                 out match,
                 out matchKind,
                 out matchStartIndex,
