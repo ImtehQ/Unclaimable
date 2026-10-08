@@ -232,7 +232,7 @@ public sealed partial class Checker : IChecker
         foreach (var entry in BuiltInEntries.Value)
         {
             if (!options.IncludeHighCollisionIdentityTerms
-                && OptionalIdentityData.IsHighCollisionValue(entry.Value))
+                && OptionalIdentityData.IsHighCollisionValue(entry.Value, entry.Category))
             {
                 continue;
             }

@@ -25,8 +25,8 @@ public sealed class Regression083Tests
     }
 
     [Theory]
-    [InlineData("thesugarlook.com", "thesugarl0ok.com.evil.com", DomainLookalikeKind.Confusable)]
-    [InlineData("thesugarlook.com", "www.thesugarl0ok.com", DomainLookalikeKind.Confusable)]
+    [InlineData("samplebrand.com", "samp1ebrand.com.evil.com", DomainLookalikeKind.Confusable)]
+    [InlineData("samplebrand.com", "www.samp1ebrand.com", DomainLookalikeKind.Confusable)]
     [InlineData("service.com", "s3rv1ce.com", DomainLookalikeKind.Confusable)]
     [InlineData("amazon.com", "arnazon.com", DomainLookalikeKind.Confusable)]
     public void ProtectedDomainLookalikesAreMatchedByRelevantLabels(
@@ -75,6 +75,16 @@ public sealed class Regression083Tests
     [InlineData("police")]
     [InlineData("dollar")]
     [InlineData("pound")]
+    [InlineData("php")]
+    [InlineData("usd")]
+    [InlineData("rub")]
+    [InlineData("rand")]
+    [InlineData("pilot")]
+    [InlineData("engineer")]
+    [InlineData("judge")]
+    [InlineData("captain")]
+    [InlineData("general")]
+    [InlineData("soldier")]
     public void HighCollisionIdentityTermsAreClaimableByDefault(string value)
     {
         Assert.True(new Checker().IsClaimable(value), value);

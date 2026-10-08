@@ -4,17 +4,53 @@ namespace Unclaimable;
 
 internal static class OptionalIdentityData
 {
-    private static readonly HashSet<string> HighCollisionValues =
+    private static readonly HashSet<string> HighCollisionCurrencyWords =
         new HashSet<string>(StringComparer.Ordinal)
         {
-            "try", "sol", "won", "eth", "dollar", "pound",
-            "ces",
-            "private", "major", "officer", "army", "navy",
-            "doctor", "nurse", "teacher", "police"
+            "dollar", "pound", "rand", "sterling"
         };
 
-    internal static bool IsHighCollisionValue(string value) =>
-        HighCollisionValues.Contains(value.Trim().ToLowerInvariant());
+    internal static bool IsHighCollisionValue(string value, Rule rule)
+    {
+        var normalized = value.Trim().ToLowerInvariant();
+
+        switch (rule)
+        {
+            case Rule.Professions:
+            case Rule.Military:
+                return true;
+            case Rule.Currencies:
+                return normalized.Length <= 3
+                    || HighCollisionCurrencyWords.Contains(normalized);
+            case Rule.Events:
+                return normalized.Length <= 3;
+            default:
+                return false;
+        }
+    }
+
+    internal static bool IsHighCollisionValue(string value, string category)
+    {
+        var rule = GetRuleForCategory(category);
+        return rule.HasValue && IsHighCollisionValue(value, rule.Value);
+    }
+
+    private static Rule? GetRuleForCategory(string category)
+    {
+        switch (category)
+        {
+            case "currency":
+                return Rule.Currencies;
+            case "event":
+                return Rule.Events;
+            case "profession":
+                return Rule.Professions;
+            case "military":
+                return Rule.Military;
+            default:
+                return null;
+        }
+    }
 
     internal const string NationalityPrefix = "__unclaimable_internal_nationality_rule__:";
     internal const string CurrencyPrefix = "__unclaimable_internal_currency_rule__:";

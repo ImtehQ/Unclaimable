@@ -117,7 +117,7 @@ public sealed partial class Options
         foreach (var value in values)
         {
             if (!IncludeHighCollisionIdentityTerms
-                && OptionalIdentityData.IsHighCollisionValue(value))
+                && OptionalIdentityData.IsHighCollisionValue(value, rule))
             {
                 continue;
             }

@@ -17,7 +17,7 @@
 
 ### Default identity-list refinement
 
-- Collision-heavy ordinary terms such as short currency codes/words, `ces`, common professions, and common military words are claimable by default.
+- Collision-heavy identity vocabulary is filtered by category instead of a short one-off word list. Profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations are claimable by default.
 - Set `Options.IncludeHighCollisionIdentityTerms = true` to restore protection for that broader vocabulary without changing the enabled identity-rule flags.
 
 ### Performance
