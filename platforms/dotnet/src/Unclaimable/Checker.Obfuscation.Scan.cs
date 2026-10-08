@@ -42,7 +42,8 @@ public sealed partial class Checker
                     value,
                     pair.Key.Length,
                     preserveNonCompactCharacters,
-                    editBudget))
+                    editBudget,
+                    directPotential))
             {
                 continue;
             }

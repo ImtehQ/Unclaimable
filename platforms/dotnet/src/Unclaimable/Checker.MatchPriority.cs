@@ -18,7 +18,7 @@ public sealed partial class Checker
         foreach (var pair in entries)
         {
             if (!CanObfuscationLengthsMatch(
-                    value, pair.Key.Length, preserveNonCompactCharacters, 0))
+                    value, pair.Key.Length, preserveNonCompactCharacters, 0, directPotential: true))
             {
                 continue;
             }

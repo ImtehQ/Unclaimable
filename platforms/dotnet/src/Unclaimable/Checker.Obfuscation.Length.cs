@@ -6,20 +6,24 @@ public sealed partial class Checker
         string source,
         int targetLength,
         bool preserveNonCompactCharacters,
-        int editBudget)
+        int editBudget,
+        bool directPotential)
     {
         var comparable = preserveNonCompactCharacters
             ? source.Length
             : CountCompactComparableCharacters(source);
 
-        if (_obfuscationSensitivity >= ObfuscationSensitivity.High)
+        if (_obfuscationSensitivity >= ObfuscationSensitivity.High
+            && directPotential)
         {
+            // Multi-character visual aliases can legitimately collapse the source,
+            // so only apply the broad upper bound when such evidence is present.
             return targetLength >= 1
                    && targetLength <= source.Length + editBudget;
         }
 
         return targetLength >= Math.Max(1, comparable - editBudget)
-               && targetLength <= source.Length + editBudget;
+               && targetLength <= comparable + editBudget;
     }
 
     private static int CountCompactComparableCharacters(string value)
