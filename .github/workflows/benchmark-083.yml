@@ -1,0 +1,69 @@
+name: .NET 0.8.3 Benchmarks
+
+on:
+  push:
+    branches:
+      - "0.8.3"
+    paths:
+      - ".github/workflows/benchmark-083.yml"
+      - "platforms/dotnet/benchmarks/Unclaimable.Benchmarks083/**"
+      - "platforms/dotnet/src/Unclaimable/**"
+      - "platforms/dotnet/src/Unclaimable.Email/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout 0.8.3
+        uses: actions/checkout@v4
+        with:
+          path: current
+
+      - name: Checkout 0.8.2 baseline
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: baseline
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Copy identical benchmark harness to baseline
+        shell: bash
+        run: |
+          rm -rf baseline/platforms/dotnet/benchmarks/Unclaimable.Benchmarks083
+          cp -R current/platforms/dotnet/benchmarks/Unclaimable.Benchmarks083 \
+            baseline/platforms/dotnet/benchmarks/Unclaimable.Benchmarks083
+
+      - name: Benchmark 0.8.2 baseline
+        working-directory: baseline
+        run: dotnet run --project platforms/dotnet/benchmarks/Unclaimable.Benchmarks083/Unclaimable.Benchmarks083.csproj -c Release -- --filter "*"
+
+      - name: Benchmark 0.8.3
+        working-directory: current
+        run: dotnet run --project platforms/dotnet/benchmarks/Unclaimable.Benchmarks083/Unclaimable.Benchmarks083.csproj -c Release -- --filter "*"
+
+      - name: Show benchmark reports
+        shell: bash
+        run: |
+          echo "## 0.8.2 baseline"
+          find baseline -path "*/BenchmarkDotNet.Artifacts/results/*-report-github.md" -print -exec cat {} \;
+          echo "## 0.8.3"
+          find current -path "*/BenchmarkDotNet.Artifacts/results/*-report-github.md" -print -exec cat {} \;
+
+      - name: Upload benchmark reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: unclaimable-083-benchmarks
+          path: |
+            baseline/**/BenchmarkDotNet.Artifacts/results/*
+            current/**/BenchmarkDotNet.Artifacts/results/*
+          if-no-files-found: error
