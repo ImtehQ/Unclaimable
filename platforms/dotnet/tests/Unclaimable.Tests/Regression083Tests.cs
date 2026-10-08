@@ -142,6 +142,136 @@ public sealed class Regression083Tests
         Assert.True(new Checker(options).IsClaimable(" aaa "));
     }
 
+    [Theory]
+    [InlineData("wood.com", "vvood.com")]
+    [InlineData("cloud.com", "cloucl.com")]
+    [InlineData("brand.co.uk", "br4nd.co.uk")]
+    public void AdditionalProtectedDomainVisualFormsAreDetected(
+        string protectedDomain,
+        string candidateDomain)
+    {
+        var options = new EmailOptions();
+        options.ProtectedDomains.Add(protectedDomain);
+
+        var result = new EmailChecker(options)
+            .CheckExistingAddress("bluegarden@" + candidateDomain);
+
+        Assert.False(result.IsAllowed);
+        Assert.Equal(DomainLookalikeKind.Confusable, result.DomainLookalikeKind);
+        Assert.Equal(protectedDomain, result.MatchedProtectedDomain);
+    }
+
+    [Fact]
+    public void ProtectedDomainWithCommonSecondLevelSuffixAllowsRealSubdomains()
+    {
+        var options = new EmailOptions();
+        options.ProtectedDomains.Add("brand.co.uk");
+
+        var checker = new EmailChecker(options);
+
+        Assert.True(checker.CheckExistingAddress("bluegarden@brand.co.uk").IsAllowed);
+        Assert.True(checker.CheckExistingAddress("bluegarden@mail.brand.co.uk").IsAllowed);
+    }
+
+    [Fact]
+    public void SupplementaryPrivateUseCharacterIsRejectedInEmailLocalPart()
+    {
+        var result = new EmailChecker()
+            .CheckExistingAddress("bluegarden\U000F0000@example.com");
+
+        Assert.False(result.IsAllowed);
+        Assert.Equal(EmailFailureKind.InvalidFormat, result.FailureKind);
+    }
+
+    [Theory]
+    [InlineData("userA")]
+    [InlineData("userⅫ")]
+    [InlineData("user\U00010107")]
+    public void NumbersRuleDoesNotRejectNonDecimalNumericLookalikes(string value)
+    {
+        var options = new Options();
+        options.EnableRule(Rule.Numbers);
+
+        var result = new Checker(options).Check(value);
+
+        Assert.NotEqual(MatchKind.NumbersNotAllowed, result.MatchKind);
+    }
+
+    [Fact]
+    public void NumbersRuleRejectsCompatibilityFractionContainingDecimalDigits()
+    {
+        var options = new Options();
+        options.EnableRule(Rule.Numbers);
+
+        var result = new Checker(options).Check("user½");
+
+        Assert.Equal(MatchKind.NumbersNotAllowed, result.MatchKind);
+    }
+
+    [Theory]
+    [InlineData("ééé")]
+    [InlineData("éaéa")]
+    public void RepeatedPatternSupportsNonAsciiTextElements(string value)
+    {
+        var result = new Checker().Check(value);
+
+        Assert.Equal(MatchKind.RepeatedPattern, result.MatchKind);
+    }
+
+    [Fact]
+    public void RepeatedAsciiFastPathIsCaseInsensitive()
+    {
+        var result = new Checker().Check("AaAa");
+
+        Assert.Equal(MatchKind.RepeatedPattern, result.MatchKind);
+    }
+
+    [Fact]
+    public void AllowedRepeatedAsciiCharacterBypassesDirectRun()
+    {
+        var options = new Options();
+        options.AllowRepeatedCharacters("a");
+
+        var result = new Checker(options).Check("AAA");
+
+        Assert.NotEqual(MatchKind.RepeatedPattern, result.MatchKind);
+    }
+
+    [Fact]
+    public void AsciiArtPatternCompactsWhitespaceOnlyWhenNeeded()
+    {
+        var options = new Options();
+        options.DisableRule(Rule.Whitespace | Rule.BlockedCharacters);
+
+        var result = new Checker(options).Check("8 = = = D");
+
+        Assert.Equal(MatchKind.AsciiArt, result.MatchKind);
+    }
+
+    [Theory]
+    [InlineData("zqxé")]
+    [InlineData("zqx\U00010400")]
+    public void UnicodeScalarsPassNormalPolicyScanningWithoutMalformedUtf16(string value)
+    {
+        var result = new Checker().Check(value);
+
+        Assert.NotEqual(MatchKind.InvalidCharacters, result.MatchKind);
+    }
+
+    [Fact]
+    public void RuleExceptionUsesTrimmedCompatibilityNormalizedIdentifier()
+    {
+        var options = new Options();
+        options.EnableRule(Rule.Numbers);
+        options.DisableRule(Rule.Whitespace);
+        options.DisablePattern(Pattern.NumericOnly | Pattern.Repeated);
+        options.AllowIdentifierForRule(" １２３ ", Rule.Numbers);
+
+        var result = new Checker(options).Check(" 123 ");
+
+        Assert.NotEqual(MatchKind.NumbersNotAllowed, result.MatchKind);
+    }
+
     [Fact]
     public void UserReservationStartingWithInternalPrefixRemainsLiteral()
     {
