@@ -18,9 +18,24 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## Current release: 0.8.2 LTS
+## 0.8.3 release candidate
 
-0.8.2 hardens obfuscation and evasion matching, adds configurable sensitivity levels, and removes the previous candidate-expansion ceiling while keeping the default policy deliberately conservative.
+0.8.3 focuses on correctness, lower false-positive rates, protected-domain matching, and allocation reduction. It also changes the project license prospectively from this version onward.
+
+### High-collision identity terms
+
+The identity-rule flags remain enabled by default, but 0.8.3 no longer exact-blocks collision-heavy generic identity vocabulary by default. Common profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations remain claimable unless explicitly requested.
+
+To restore the broader 0.8.0–0.8.2 identity behavior:
+
+```csharp
+var options = new Options
+{
+    IncludeHighCollisionIdentityTerms = true
+};
+```
+
+This does not disable the identity rules themselves; lower-collision protected identities continue to participate normally.
 
 ## 0.8.2: obfuscation hardening
 
@@ -218,7 +233,7 @@ ababab   -> rejected: repeated span reaches 6
 abcabc   -> rejected: repeated span reaches 6
 ```
 
-All built-in rules are enabled by default except `Rule.Numbers`; this includes the protected country, city, celebrity, and other identity rules. Mixed alphanumeric names remain possible, while `Pattern.NumericOnly` continues to reject all-numeric identifiers. `Pattern.UppercaseOnly` remains opt-in.
+All built-in rule flags are enabled by default except `Rule.Numbers`; this includes the protected country, city, celebrity, and other identity rules. Starting in 0.8.3, collision-heavy generic identity terms are filtered out unless `IncludeHighCollisionIdentityTerms` is enabled. Mixed alphanumeric names remain possible, while `Pattern.NumericOnly` continues to reject all-numeric identifiers. `Pattern.UppercaseOnly` remains opt-in.
 
 For copy-paste recipes, precedence, migration guidance, ASP.NET Core setup, Email local-part customization, and Extended-data exceptions, see the **[configuration and exceptions guide](docs/CONFIGURATION.md)**.
 
@@ -228,13 +243,13 @@ The repository contains three companion packages that share the same release ver
 
 ### Unclaimable.AspNetCore
 
-Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.2 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
+Adds dependency injection and DataAnnotations integration around the Core checker. In 0.8.3 it ships explicit framework assets for `net6.0` through `net11.0` and uses the same Core defaults, including default-on multilingual profanity matching across the localized profanity datasets, unless the application configures them differently.
 
 See [the ASP.NET Core package README](platforms/dotnet/src/Unclaimable.AspNetCore/README.NUGET.md).
 
 ### Unclaimable.Email
 
-Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.2 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
+Adds email local-part identity checking plus protected-domain lookalike and impersonation detection. Its local-part checker starts from the same Core 0.8.3 defaults, including default-on multilingual profanity matching across the localized profanity datasets, while email-specific syntax concerns such as username length, separator, blocked-character, whitespace, and shape checks are handled separately.
 
 See [the Email package README](platforms/dotnet/src/Unclaimable.Email/README.NUGET.md).
 
@@ -274,7 +289,7 @@ builder.Services.AddUnclaimable(options =>
 });
 ```
 
-Representative identities include `dutch`, `euro`, `bitcoin`, `christianity`, `eiffeltower`, `olympics`, `nobelprize`, `darthvader`, `starwars`, `doctor`, and `airforce`.
+Representative lower-collision identities include `dutch`, `euro`, `bitcoin`, `christianity`, `eiffeltower`, `olympics`, `nobelprize`, `darthvader`, and `starwars`. Collision-heavy profession, military, short-currency, and short-event terms require `IncludeHighCollisionIdentityTerms = true` in 0.8.3.
 
 The lists use normalized exact matching, case-insensitive matching, compact separator/punctuation matching, configured obfuscation/leetspeak matching, and selected Unicode-confusable matching. They deliberately do **not** become generic substring roots.
 
