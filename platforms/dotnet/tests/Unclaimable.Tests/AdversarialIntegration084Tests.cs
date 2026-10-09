@@ -35,6 +35,14 @@ public sealed class AdversarialIntegration084Tests
     }
 
     [Fact]
+    public void SuffixResolverHandlesSingleLabelWithoutAnIndexError()
+    {
+        var type = typeof(EmailChecker).Assembly.GetType("Unclaimable.Email.PublicSuffixResolver", throwOnError: true)!;
+        var method = type.GetMethod("GetRegistrantLabel", BindingFlags.Static | BindingFlags.NonPublic)!;
+        Assert.Equal("localhost", (string)method.Invoke(null, new object[] { "localhost" })!);
+    }
+
+    [Fact]
     public void LongInvalidMailboxIsRejectedBeforeProtectedMatching()
     {
         var options = new EmailOptions();
