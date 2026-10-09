@@ -20,6 +20,8 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 ## 0.8.3: correctness, lower false positives, and lower allocations
 
+**Released: 2026-10-09**
+
 0.8.3 hardens Unicode and email-domain handling, reduces collision-heavy default blocking, and substantially lowers managed allocations on common matching paths.
 
 ### Correctness fixes
