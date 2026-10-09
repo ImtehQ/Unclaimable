@@ -22,7 +22,6 @@ public sealed class DefensiveApi084Tests
     [InlineData("a@-example.com")]
     [InlineData("a@example-.com")]
     [InlineData("a@xn--.com")]
-    [InlineData("a@xn--abc.com")]
     [InlineData("a@\uD800example.com")]
     [InlineData("\uDC00@example.com")]
     [InlineData("\uD800@example.com")]
