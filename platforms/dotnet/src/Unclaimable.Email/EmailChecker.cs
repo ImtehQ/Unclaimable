@@ -154,10 +154,17 @@ public sealed class EmailChecker : IEmailChecker
             throw new ArgumentOutOfRangeException(nameof(purpose));
         }
 
+        var effectivePurpose = _emailUsage == EmailUsage.Auto
+            ? purpose
+            : (_emailUsage == EmailUsage.IssuedAddress
+                ? EmailAddressPurpose.NewAddress
+                : EmailAddressPurpose.ExistingAddress);
+
         if (address != null && address.Length > _maximumInputLength)
         {
             return new EmailResult(address, purpose, null, null,
-                EmailFailureKind.InvalidFormat, null, DomainLookalikeKind.None, null);
+                EmailFailureKind.InvalidFormat, null, DomainLookalikeKind.None, null,
+                effectivePurpose: effectivePurpose);
         }
 
         ParsedAddress? parsed;
@@ -173,14 +180,10 @@ public sealed class EmailChecker : IEmailChecker
                 syntaxFailure,
                 null,
                 DomainLookalikeKind.None,
-                null);
+                null,
+                effectivePurpose: effectivePurpose);
         }
 
-        var effectivePurpose = _emailUsage == EmailUsage.Auto
-            ? purpose
-            : (_emailUsage == EmailUsage.IssuedAddress
-                ? EmailAddressPurpose.NewAddress
-                : EmailAddressPurpose.ExistingAddress);
         var relaxedExisting = _emailProtectionLevel == EmailProtectionLevel.Relaxed
             && effectivePurpose == EmailAddressPurpose.ExistingAddress;
         var localPartResult = _localPartChecker.Check(parsed!.LocalPart);
