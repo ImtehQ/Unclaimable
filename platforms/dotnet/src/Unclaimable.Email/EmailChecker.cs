@@ -667,7 +667,17 @@ public sealed class EmailChecker : IEmailChecker
         string protectedLabel,
         string protectedSkeleton)
     {
-        var candidateUnicode = new IdnMapping().GetUnicode(candidateLabel);
+        string candidateUnicode;
+        try
+        {
+            candidateUnicode = new IdnMapping().GetUnicode(candidateLabel);
+        }
+        catch (ArgumentException)
+        {
+            // A platform-specific IDNA decoding failure must not make a
+            // syntactically validated mailbox crash during lookalike checks.
+            return false;
+        }
         bool changed;
         var candidateSkeleton = global::Unclaimable.ConfusableNormalizer.CreateSkeleton(
             candidateUnicode,
