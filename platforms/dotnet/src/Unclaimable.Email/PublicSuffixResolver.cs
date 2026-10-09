@@ -45,7 +45,16 @@ internal static class PublicSuffixResolver
                         prefix = "*.";
                         line = line.Substring(2);
                     }
-                    rules.Add(prefix + idn.GetAscii(line).ToLowerInvariant());
+                    try
+                    {
+                        rules.Add(prefix + idn.GetAscii(line).ToLowerInvariant());
+                    }
+                    catch (ArgumentException)
+                    {
+                        // Older .NET IDNA implementations may reject Unicode rules
+                        // that are valid in newer IDNA revisions.
+                        // Keep loading the remainder of the pinned dataset.
+                    }
                 }
                 return rules;
             }
