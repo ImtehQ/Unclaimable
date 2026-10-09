@@ -174,3 +174,38 @@ Other enabled local-part, syntax, and domain-lookalike checks can still reject a
 
 `IssuingDomains` are still automatically included in protected-domain checks. This
 allowlist controls accepted issuing domains; it does not disable other protections.
+
+### Context-aware existing email validation (0.8.4)
+
+The defaults preserve 0.8.3's strict behavior. To accept externally owned
+email addresses without automatically denying reserved-looking mailbox names
+or lookalike domains:
+
+```csharp
+var options = new EmailOptions
+{
+    EmailUsage = EmailUsage.ExistingAddress,
+    EmailProtectionLevel = EmailProtectionLevel.Relaxed
+};
+var checker = new EmailChecker(options);
+var result = checker.CheckExistingAddress("admin@example.com");
+bool allowed = result.IsAllowed; // true, assuming valid syntax and no explicit domain allowlist
+bool suspicious = result.IsSuspiciousDomain; // remains available independently
+```
+
+`EmailUsage.Auto` (default) retains the purpose passed to `Check`,
+`CheckExistingAddress`, or `CheckNewAddress`. Selecting `ExistingAddress`
+or `IssuedAddress` overrides the caller-provided purpose when selecting policy.
+`EmailProtectionLevel.Strict` (default) preserves historical enforcement.
+`Relaxed` applies only to externally owned addresses: syntax validation,
+explicit issuing-domain restrictions, and all full issuing-address checks remain
+enforced. Reserved local-part and protected-domain findings are still included
+in `LocalPartResult` and `DomainLookalikeKind`.
+
+The suffix-aware protected-domain matcher has a bundled offline rule subset
+(including `co.za`) with wildcard and exception support. It does not yet
+include every rule from the upstream Public Suffix List.
+
+Unicode-confusable detection remains a selected mapping set rather than complete
+UTS #39 conformance. Combining marks may be removed while constructing matching
+skeletons; evaluate strict modes for false positives with internationalized inputs.
