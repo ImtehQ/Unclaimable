@@ -648,42 +648,8 @@ public sealed class EmailChecker : IEmailChecker
                 && candidate.EndsWith("." + configuredDomain, StringComparison.Ordinal));
     }
 
-    private static string GetRegistrantLabel(string domain)
-    {
-        var labels = domain.Split('.');
-        var labelIndex = labels.Length - 2;
-
-        if (labels.Length >= 3 && IsCommonSecondLevelPublicSuffix(labels[labels.Length - 2], labels[labels.Length - 1]))
-        {
-            labelIndex--;
-        }
-
-        return labels[labelIndex];
-    }
-
-    private static bool IsCommonSecondLevelPublicSuffix(string secondLevel, string topLevel)
-    {
-        var suffix = secondLevel + "." + topLevel;
-        switch (suffix)
-        {
-            case "co.uk":
-            case "org.uk":
-            case "gov.uk":
-            case "ac.uk":
-            case "com.au":
-            case "net.au":
-            case "org.au":
-            case "co.nz":
-            case "co.jp":
-            case "com.br":
-            case "com.mx":
-            case "com.sg":
-            case "com.tr":
-                return true;
-            default:
-                return false;
-        }
-    }
+    private static string GetRegistrantLabel(string domain) =>
+        PublicSuffixResolver.GetRegistrantLabel(domain);
 
     private static bool AreDomainLabelsVisuallyEquivalent(
         string candidateLabel,
