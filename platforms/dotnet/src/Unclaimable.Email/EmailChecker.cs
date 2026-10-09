@@ -63,6 +63,7 @@ public sealed class EmailChecker : IEmailChecker
     private readonly bool _detectTypographicalLookalikes;
     private readonly bool _detectProtectedLabelReuse;
     private readonly int _maximumDomainEditDistance;
+    private readonly int _maximumInputLength;
     private readonly EmailUsage _emailUsage;
     private readonly EmailProtectionLevel _emailProtectionLevel;
 
@@ -110,6 +111,9 @@ public sealed class EmailChecker : IEmailChecker
         {
             throw new ArgumentOutOfRangeException(nameof(options.EmailProtectionLevel));
         }
+        if (options.MaximumInputLength < 1)
+            throw new ArgumentOutOfRangeException(nameof(options.MaximumInputLength));
+        _maximumInputLength = options.MaximumInputLength;
         _emailUsage = options.EmailUsage;
         _emailProtectionLevel = options.EmailProtectionLevel;
         _allowIssuingDomainSubdomains = options.AllowIssuingDomainSubdomains;
@@ -148,6 +152,12 @@ public sealed class EmailChecker : IEmailChecker
             && purpose != EmailAddressPurpose.NewAddress)
         {
             throw new ArgumentOutOfRangeException(nameof(purpose));
+        }
+
+        if (address != null && address.Length > _maximumInputLength)
+        {
+            return new EmailResult(address, purpose, null, null,
+                EmailFailureKind.InvalidFormat, null, DomainLookalikeKind.None, null);
         }
 
         ParsedAddress? parsed;
@@ -209,7 +219,8 @@ public sealed class EmailChecker : IEmailChecker
             failureKind,
             localPartResult,
             domainAssessment.Kind,
-            domainAssessment.MatchedProtectedDomain);
+            domainAssessment.MatchedProtectedDomain,
+            approvedIssuingDomain);
     }
 
     private DomainAssessment AssessDomain(string originalDomain, string normalizedDomain)
