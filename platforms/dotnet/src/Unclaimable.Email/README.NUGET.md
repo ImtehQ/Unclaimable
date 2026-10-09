@@ -202,9 +202,9 @@ explicit issuing-domain restrictions, and all full issuing-address checks remain
 enforced. Reserved local-part and protected-domain findings are still included
 in `LocalPartResult` and `DomainLookalikeKind`.
 
-The suffix-aware protected-domain matcher has a bundled offline rule subset
-(including `co.za`) with wildcard and exception support. It does not yet
-include every rule from the upstream Public Suffix List.
+The suffix-aware protected-domain matcher uses a pinned full offline Public Suffix List
+snapshot (ICANN and private domains) with wildcard and exception support.
+The embedded upstream list is licensed under MPL-2.0, separately from the package.
 
 Unicode-confusable detection remains a selected mapping set rather than complete
 UTS #39 conformance. Combining marks may be removed while constructing matching
