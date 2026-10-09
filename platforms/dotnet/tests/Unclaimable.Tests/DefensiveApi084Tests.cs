@@ -38,9 +38,9 @@ public sealed class DefensiveApi084Tests
         var checker = new EmailChecker(EmailOptions.ForUserRegistration());
         var malformed = new[]
         {
-            new string(new[] { '\\uD800', '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
-            new string(new[] { '\\uDC00', '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
-            "a@ex" + new string(new[] { '\\uD800' }) + "ample.com"
+            new string(new[] { (char)0xD800, '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
+            new string(new[] { (char)0xDC00, '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
+            "a@ex" + new string(new[] { (char)0xD800 }) + "ample.com"
         };
         foreach (var address in malformed)
         {
