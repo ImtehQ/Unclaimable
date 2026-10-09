@@ -67,6 +67,41 @@ public sealed class EmailOptions
     /// <summary>Strict retains earlier behavior; Relaxed permits reserved-looking local parts and suspicious domains for existing addresses.</summary>
     public EmailProtectionLevel EmailProtectionLevel { get; set; } = EmailProtectionLevel.Strict;
 
+    /// <summary>
+    /// Optional maximum input length in UTF-16 code units, checked before parsing.
+    /// The default has no additional limit; email syntax still enforces its normal bounds.
+    /// </summary>
+    public int MaximumInputLength { get; set; } = int.MaxValue;
+
+    /// <summary>Preset for accepting existing third-party mailbox identities.</summary>
+    public static EmailOptions ForUserRegistration() => new EmailOptions
+    {
+        EmailUsage = EmailUsage.ExistingAddress,
+        EmailProtectionLevel = EmailProtectionLevel.Relaxed
+    };
+
+    /// <summary>Preset for restricting existing addresses to an exact organizational domain.</summary>
+    public static EmailOptions ForOrganizationEmail(string domain)
+    {
+        if (string.IsNullOrWhiteSpace(domain)) throw new ArgumentException("Domain is required.", nameof(domain));
+        var options = new EmailOptions
+        {
+            EmailUsage = EmailUsage.ExistingAddress,
+            EmailProtectionLevel = EmailProtectionLevel.Strict,
+            EnforceIssuingDomainsForExistingAddresses = true,
+            AllowIssuingDomainSubdomains = false
+        };
+        options.IssuingDomains.Add(domain);
+        return options;
+    }
+
+    /// <summary>Preset for email addresses created and issued by this application.</summary>
+    public static EmailOptions ForIssuedAddresses() => new EmailOptions
+    {
+        EmailUsage = EmailUsage.IssuedAddress,
+        EmailProtectionLevel = EmailProtectionLevel.Strict
+    };
+
     /// <summary>Gets or sets whether Unicode and common ASCII lookalike-domain detection is enabled.</summary>
     public bool DetectUnicodeLookalikes { get; set; } = true;
 
