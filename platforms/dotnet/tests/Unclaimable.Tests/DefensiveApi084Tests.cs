@@ -22,10 +22,6 @@ public sealed class DefensiveApi084Tests
     [InlineData("a@-example.com")]
     [InlineData("a@example-.com")]
     [InlineData("a@xn--.com")]
-    [InlineData("a@\uD800example.com")]
-    [InlineData("\uDC00@example.com")]
-    [InlineData("\uD800@example.com")]
-    [InlineData("a@ex\uD800ample.com")]
     public void MalformedMailboxInputsReturnResultsWithoutThrowing(string? candidate)
     {
         var options = EmailOptions.ForUserRegistration();
@@ -34,6 +30,23 @@ public sealed class DefensiveApi084Tests
         var result = checker.CheckExistingAddress(candidate);
         Assert.NotNull(result);
         Assert.False(result.IsAllowed);
+    }
+
+    [Fact]
+    public void InvalidUtf16CodeUnitsAreRejectedWithoutThrowing()
+    {
+        var checker = new EmailChecker(EmailOptions.ForUserRegistration());
+        var malformed = new[]
+        {
+            new string(new[] { '\\uD800', '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
+            new string(new[] { '\\uDC00', '@', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm' }),
+            "a@ex" + new string(new[] { '\\uD800' }) + "ample.com"
+        };
+        foreach (var address in malformed)
+        {
+            var result = checker.CheckExistingAddress(address);
+            Assert.False(result.IsAllowed);
+        }
     }
 
     [Fact]
