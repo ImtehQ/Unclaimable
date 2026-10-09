@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.3 - Unreleased
+## 0.8.3 - 2026-10-09
 
 > **Default-behavior note:** 0.8.3 narrows several collision-prone identity-list defaults while preserving the broader lists behind `Options.IncludeHighCollisionIdentityTerms`. It also corrects Unicode, email-domain, obfuscation, numeric-normalization, and scoped-exception behavior.
 

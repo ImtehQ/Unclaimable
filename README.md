@@ -18,13 +18,24 @@ Prevent reserved, protected, misleading, degenerate, and unsafe identifiers befo
 
 [**NuGet**](https://www.nuget.org/packages/Unclaimable) · [**Configuration guide**](docs/CONFIGURATION.md) · [**Changelog**](CHANGELOG.md)
 
-## 0.8.3 release candidate
+## 0.8.3: correctness, lower false positives, and lower allocations
 
-0.8.3 focuses on correctness, lower false-positive rates, protected-domain matching, and allocation reduction. It also changes the project license prospectively from this version onward.
+0.8.3 hardens Unicode and email-domain handling, reduces collision-heavy default blocking, and substantially lowers managed allocations on common matching paths.
 
-### High-collision identity terms
+### Correctness fixes
 
-The identity-rule flags remain enabled by default, but 0.8.3 no longer exact-blocks collision-heavy generic identity vocabulary by default. Common profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations remain claimable unless explicitly requested.
+- Supplementary-plane combining marks are handled as complete Unicode scalars, preventing malformed UTF-16 failures during confusable normalization.
+- Protected-domain detection compares the relevant DNS labels instead of applying edit distance to the entire domain string.
+- Domain visual matching supports the normal digit/leetspeak mappings plus selected multi-character forms such as `rn -> m`, `vv -> w`, and `cl -> d`.
+- High-sensitivity obfuscation now charges each inserted character against the edit budget instead of treating an unlimited repeated run as one edit.
+- `Rule.Numbers` also catches compatibility-normalized number forms.
+- Scoped rule/pattern exceptions use the same trimmed NFKC/case normalization as matching.
+- Literal custom reservations that begin with the internal reservation prefix are no longer interpreted as generated identity-list commands.
+- Built-in entries are deduplicated after exact normalization while preserving first-loaded category precedence and partial-match participation.
+
+### Lower-collision defaults
+
+The identity-rule flags remain enabled by default, but collision-heavy generic identity vocabulary is no longer exact-blocked by default. Common profession and military terms, short currency codes, selected ambiguous currency words, and short event abbreviations remain claimable unless explicitly requested.
 
 To restore the broader 0.8.0–0.8.2 identity behavior:
 
@@ -36,6 +47,20 @@ var options = new Options
 ```
 
 This does not disable the identity rules themselves; lower-collision protected identities continue to participate normally.
+
+### Performance
+
+The 0.8.3 matcher adds ASCII fast paths, avoids unnecessary compact copies and normalization work, reuses obfuscation recursion state, caches substitution tables, and prunes impossible High/Extreme near-match lengths before recursion.
+
+A representative BenchmarkDotNet comparison against 0.8.2 reduced allocations from **1.98 KB to 144 B** for an ordinary accepted Core check, **13.68 KB to 696 B** for an obfuscation hit, and **470.66 KB to about 1.8 KB** for the High near-match miss regression case.
+
+Release-preparation CI passes **4,091 tests** with **98.06% production line coverage** and **83.61% branch coverage**. Core, ASP.NET Core, Email, and Extended 0.8.3 packages also pass package validation and the packaged-consumer smoke test.
+
+### License from 0.8.3 onward
+
+Starting with 0.8.3, Unclaimable is licensed under the Apache License 2.0 with the Commons Clause License Condition v1.0. Unclaimable remains free to use as an embedded component of commercial products and value-added paid services, while selling Unclaimable itself or a product/service whose value derives entirely or substantially from Unclaimable's functionality is restricted.
+
+Versions 0.8.2 and earlier remain under the license attached to those releases.
 
 ## 0.8.2: obfuscation hardening
 
