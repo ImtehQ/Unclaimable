@@ -111,3 +111,30 @@ public class PartialMatchingScale084Benchmarks
     [Benchmark]
     public Result CheckLateMatch() => _checker.Check("prefix" + _lastEntry + "suffix");
 }
+
+[MemoryDiagnoser]
+[SimpleJob(warmupCount: 2, iterationCount: 6)]
+public class AdversarialObfuscation084Benchmarks
+{
+    private Checker _checker = null!;
+    private string _candidate = null!;
+
+    [Params(ObfuscationSensitivity.Medium, ObfuscationSensitivity.High, ObfuscationSensitivity.Extreme)]
+    public ObfuscationSensitivity Sensitivity { get; set; }
+
+    [Params(32, 128, 512)]
+    public int CandidateLength { get; set; }
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        var options = new Options { ObfuscationSensitivity = Sensitivity };
+        options.DisableRule(Rule.MaximumLength);
+        options.DisablePattern(Pattern.Repeated);
+        _checker = new Checker(options);
+        _candidate = "xqzv" + new string('x', CandidateLength - 4);
+    }
+
+    [Benchmark]
+    public Result CheckLongMiss() => _checker.Check(_candidate);
+}
