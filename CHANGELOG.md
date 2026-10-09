@@ -5,6 +5,9 @@
 > **Compatibility:** The default `EmailUsage.Auto` and `EmailProtectionLevel.Strict` preserve the established strict email-validation behavior. No existing `EmailAddressPurpose` or `EmailFailureKind` values are changed. The package is not released yet.
 
 ### Email policy
+- Add opt-in `EmailOptions.ForUserRegistration()`, `ForOrganizationEmail(domain)`, and `ForIssuedAddresses()` presets, plus independent email syntax, local-part reservation, and issuing-domain allowlist diagnostics.
+- Add opt-in `MaximumInputLength` for early email input rejection without changing legacy defaults.
+- Add IDN/punycode, case-folding, trailing-dot, and cross-script normalization regression tests.
 - Add `EmailUsage` (`Auto`, `ExistingAddress`, `IssuedAddress`) and `EmailProtectionLevel` (`Strict`, `Relaxed`). Relaxed mode permits reserved-looking local parts and protected-domain resemblance on externally owned addresses while retaining these diagnostics in `EmailResult`. Syntax and explicit domain allowlists still apply, and issued addresses remain strictly protected.
 - Add `AllowIssuingDomainSubdomains` (default `true`) and `EnforceIssuingDomainsForExistingAddresses` (default `false`) for exact-domain allowlists and optional login/registration restrictions.
 - Replace the manually selected multi-label suffix list with a complete pinned offline Public Suffix List snapshot, including ICANN and private suffixes, wildcard rules and exceptions. The embedded upstream PSL has its own MPL-2.0 license.
