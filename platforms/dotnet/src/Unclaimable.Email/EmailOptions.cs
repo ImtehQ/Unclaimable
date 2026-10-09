@@ -61,6 +61,12 @@ public sealed class EmailOptions
     /// </summary>
     public bool EnforceIssuingDomainsForExistingAddresses { get; set; } = false;
 
+    /// <summary>Overrides the per-call email purpose; Auto preserves the existing API behavior.</summary>
+    public EmailUsage EmailUsage { get; set; } = EmailUsage.Auto;
+
+    /// <summary>Strict retains earlier behavior; Relaxed permits reserved-looking local parts and suspicious domains for existing addresses.</summary>
+    public EmailProtectionLevel EmailProtectionLevel { get; set; } = EmailProtectionLevel.Strict;
+
     /// <summary>Gets or sets whether Unicode and common ASCII lookalike-domain detection is enabled.</summary>
     public bool DetectUnicodeLookalikes { get; set; } = true;
 
