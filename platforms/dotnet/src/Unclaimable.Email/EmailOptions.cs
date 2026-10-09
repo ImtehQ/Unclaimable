@@ -48,6 +48,19 @@ public sealed class EmailOptions
     /// </summary>
     public global::Unclaimable.Options LocalPartOptions { get; }
 
+    /// <summary>
+    /// Gets or sets whether subdomains of configured IssuingDomains are accepted.
+    /// True by default to preserve earlier releases; false requires an exact domain match.
+    /// Applies when the issuing-domain allowlist is enforced.
+    /// </summary>
+    public bool AllowIssuingDomainSubdomains { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether IssuingDomains is also enforced for externally existing
+    /// email addresses (CheckExistingAddress). False by default for compatibility.
+    /// </summary>
+    public bool EnforceIssuingDomainsForExistingAddresses { get; set; } = false;
+
     /// <summary>Gets or sets whether Unicode and common ASCII lookalike-domain detection is enabled.</summary>
     public bool DetectUnicodeLookalikes { get; set; } = true;
 
