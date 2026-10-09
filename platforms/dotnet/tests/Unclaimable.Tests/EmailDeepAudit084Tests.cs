@@ -6,6 +6,47 @@ namespace Unclaimable.Tests;
 
 public sealed class EmailDeepAudit084Tests
 {
+    [Theory]
+    [InlineData(EmailUsage.Auto, EmailAddressPurpose.NewAddress, EmailAddressPurpose.NewAddress)]
+    [InlineData(EmailUsage.Auto, EmailAddressPurpose.ExistingAddress, EmailAddressPurpose.ExistingAddress)]
+    [InlineData(EmailUsage.ExistingAddress, EmailAddressPurpose.NewAddress, EmailAddressPurpose.ExistingAddress)]
+    [InlineData(EmailUsage.IssuedAddress, EmailAddressPurpose.ExistingAddress, EmailAddressPurpose.NewAddress)]
+    public void ReportsRequestedAndEffectiveEmailPurpose(
+        EmailUsage usage, EmailAddressPurpose requested, EmailAddressPurpose effective)
+    {
+        var options = new EmailOptions { EmailUsage = usage };
+        var result = new EmailChecker(options).Check("bluegarden@example.com", requested);
+        Assert.Equal(requested, result.Purpose);
+        Assert.Equal(effective, result.EffectivePurpose);
+    }
+
+    [Fact]
+    public void EarlyInvalidInputRetainsRequestedPurposeInDiagnostics()
+    {
+        var checker = new EmailChecker(new EmailOptions
+        {
+            EmailUsage = EmailUsage.IssuedAddress,
+            MaximumInputLength = 2
+        });
+        var result = checker.CheckExistingAddress("bluegarden@example.com");
+        Assert.False(result.IsAllowed);
+        Assert.Equal(EmailAddressPurpose.ExistingAddress, result.Purpose);
+        Assert.Equal(EmailAddressPurpose.ExistingAddress, result.EffectivePurpose);
+    }
+
+    [Theory]
+    [InlineData("a@example.com")]
+    [InlineData("a@EXAMPLE.COM")]
+    [InlineData("a@sub.example.com")]
+    public void ValidConfiguredDomainDoesNotMisclassifyNormalMailboxes(string address)
+    {
+        var options = new EmailOptions();
+        options.ProtectedDomains.Add("example.com");
+        var result = new EmailChecker(options).CheckExistingAddress(address);
+        Assert.True(result.IsAllowed);
+        Assert.False(result.IsSuspiciousDomain);
+    }
+
     [Fact]
     public void TrustedDomainCannotHideAnotherProtectedDomainEmbeddedInHostname()
     {
