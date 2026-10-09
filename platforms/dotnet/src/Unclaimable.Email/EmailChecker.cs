@@ -220,7 +220,8 @@ public sealed class EmailChecker : IEmailChecker
             localPartResult,
             domainAssessment.Kind,
             domainAssessment.MatchedProtectedDomain,
-            approvedIssuingDomain);
+            approvedIssuingDomain,
+            effectivePurpose);
     }
 
     private DomainAssessment AssessDomain(string originalDomain, string normalizedDomain)
