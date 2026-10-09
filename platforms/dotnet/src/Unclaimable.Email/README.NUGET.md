@@ -209,3 +209,26 @@ The embedded upstream list is licensed under MPL-2.0, separately from the packag
 Unicode-confusable detection remains a selected mapping set rather than complete
 UTS #39 conformance. Combining marks may be removed while constructing matching
 skeletons; evaluate strict modes for false positives with internationalized inputs.
+
+### 0.8.4 policy presets and diagnostics
+
+```csharp
+var signup = EmailOptions.ForUserRegistration(); // ExistingAddress + Relaxed
+var company = EmailOptions.ForOrganizationEmail("example.com"); // exact domain
+var issued = EmailOptions.ForIssuedAddresses(); // strict issued identities
+
+var checker = new EmailChecker(signup);
+var result = checker.CheckExistingAddress("support@example.com");
+bool accepted = result.IsAllowed;
+bool syntaxValid = result.IsSyntaxValid;
+bool reservedLocalPart = result.IsLocalPartReserved;
+bool domainInAllowlist = result.IsIssuingDomainAllowed;
+bool domainResemblesProtected = result.IsSuspiciousDomain;
+```
+
+These are opt-in convenience presets. The default constructor remains strict.
+For an additional bound on work before email parsing, set
+`EmailOptions.MaximumInputLength` to a positive UTF-16 code-unit limit.
+Its default is `int.MaxValue` for compatibility; existing mailbox
+syntax limits still apply regardless of this option.
+The package does not establish DNS, MX, mailbox existence, or email ownership.
