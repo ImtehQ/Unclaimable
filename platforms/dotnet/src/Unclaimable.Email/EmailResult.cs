@@ -12,10 +12,12 @@ public sealed class EmailResult
         global::Unclaimable.Result? localPartResult,
         DomainLookalikeKind domainLookalikeKind,
         string? matchedProtectedDomain,
-        bool isIssuingDomainAllowed = true)
+        bool isIssuingDomainAllowed = true,
+        EmailAddressPurpose? effectivePurpose = null)
     {
         Address = address;
         Purpose = purpose;
+        EffectivePurpose = effectivePurpose ?? purpose;
         LocalPart = localPart;
         Domain = domain;
         FailureKind = failureKind;
@@ -30,6 +32,9 @@ public sealed class EmailResult
 
     /// <summary>Gets the purpose used for this check.</summary>
     public EmailAddressPurpose Purpose { get; }
+
+    /// <summary>Gets the policy purpose actually enforced after any EmailUsage override.</summary>
+    public EmailAddressPurpose EffectivePurpose { get; }
 
     /// <summary>Gets the parsed local part when parsing reached that stage.</summary>
     public string? LocalPart { get; }
