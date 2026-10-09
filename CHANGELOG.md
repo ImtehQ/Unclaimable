@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.8.4 - unreleased
+
+> **Compatibility:** The default `EmailUsage.Auto` and `EmailProtectionLevel.Strict` preserve the established strict email-validation behavior. No existing `EmailAddressPurpose` or `EmailFailureKind` values are changed. The package is not released yet.
+
+### Email policy
+- Add opt-in `EmailOptions.ForUserRegistration()`, `ForOrganizationEmail(domain)`, and `ForIssuedAddresses()` presets, plus independent email syntax, local-part reservation, and issuing-domain allowlist diagnostics.
+- Add opt-in `MaximumInputLength` for early email input rejection without changing legacy defaults.
+- Add IDN/punycode, case-folding, trailing-dot, and cross-script normalization regression tests.
+- Add `EmailUsage` (`Auto`, `ExistingAddress`, `IssuedAddress`) and `EmailProtectionLevel` (`Strict`, `Relaxed`). Relaxed mode permits reserved-looking local parts and protected-domain resemblance on externally owned addresses while retaining these diagnostics in `EmailResult`. Syntax and explicit domain allowlists still apply, and issued addresses remain strictly protected.
+- Add `AllowIssuingDomainSubdomains` (default `true`) and `EnforceIssuingDomainsForExistingAddresses` (default `false`) for exact-domain allowlists and optional login/registration restrictions.
+- Replace the manually selected multi-label suffix list with a complete pinned offline Public Suffix List snapshot, including ICANN and private suffixes, wildcard rules and exceptions. The embedded upstream PSL has its own MPL-2.0 license.
+
+### Tests and performance
+- Add regression cases for email usage, domain policy, multi-label suffix parsing, and a pinned subset of supported Unicode confusables.
+- Add parameterized BenchmarkDotNet scenarios for custom partial matching at 0, 100, 1,000, 5,000, and 10,000 participating reservations.
+- Add adversarial integration regression coverage for PSL wildcards and exceptions, private suffixes, long invalid mailbox rejection, large custom reservation collections, and internationalized identifiers.
+- Harden IDNA lookalike decoding against platform-specific invalid label exceptions, and extend defensive API tests across malformed mailbox input, randomized Unicode/control values, options capture, and ordinary success cases.
+- Ensure a trusted protected domain does not suppress detection of a different protected domain embedded earlier in the same hostname; extend constructor, invalid configuration, and overlapping-domain regression tests.
+- Report `EmailResult.EffectivePurpose` separately from the caller-supplied `Purpose`, including when malformed input is rejected before the policy checks; add override and normal-domain regression tests.
+- Clarify that the Core null-claimability behavior is not required-field validation and that email syntax checks are not domain verification, DNS resolution, authentication or authorization.
+- No performance or coverage claim is made until CI and benchmarks have completed.
+
 ## 0.8.3 - 2026-10-09
 
 > **Default-behavior note:** 0.8.3 narrows several collision-prone identity-list defaults while preserving the broader lists behind `Options.IncludeHighCollisionIdentityTerms`. It also corrects Unicode, email-domain, obfuscation, numeric-normalization, and scoped-exception behavior.
