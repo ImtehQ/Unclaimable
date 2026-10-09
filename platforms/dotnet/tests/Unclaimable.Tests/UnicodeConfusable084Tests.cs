@@ -21,6 +21,18 @@ public sealed class UnicodeConfusable084Tests
         Assert.True(new Checker(options).IsReserved(candidate));
     }
 
+    [Theory]
+    [InlineData("admin", "аdmin")] // Cyrillic a
+    [InlineData("admin", "admіn")] // Cyrillic i
+    [InlineData("support", "suppοrt")] // Greek omicron
+    [InlineData("support", "suрport")] // Cyrillic er
+    public void SelectedCrossScriptIdentityConfusablesAreDetected(string protectedName, string candidate)
+    {
+        var options = new Options();
+        options.AdditionalReserved.Add(protectedName);
+        Assert.True(new Checker(options).IsReserved(candidate));
+    }
+
     [Fact]
     public void UnmappedUnicodeIsNotClaimedToBeAConfusable()
     {
