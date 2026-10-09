@@ -145,3 +145,32 @@ For example, `admin@lidi.nl` can report a reserved local part while also reporti
 The package validates practical unquoted mailbox local parts plus DNS/IDN domain shape.
 
 It does **not** perform DNS or MX lookups and does not prove that a domain or mailbox exists.
+
+### Issuing-domain allowlist scope (0.8.4)
+
+`IssuingDomains` normally restricts **newly issued** email addresses, not externally existing
+addresses. Two optional settings make its scope explicit while retaining the old defaults:
+
+```csharp
+var options = new EmailOptions
+{
+    AllowIssuingDomainSubdomains = false,
+    EnforceIssuingDomainsForExistingAddresses = true
+};
+options.IssuingDomains.Add("google.com");
+
+var checker = new EmailChecker(options);
+var allowed = checker.CheckExistingAddress("employee@google.com").IsAllowed;
+```
+
+With this configuration, the **domain-policy** result accepts `google.com` and rejects
+`gmail.com`, `microsoft.com`, and `sub.google.com`.
+Other enabled local-part, syntax, and domain-lookalike checks can still reject an address.
+
+- `AllowIssuingDomainSubdomains = true` (default): allow exact issuing domains and real subdomains.
+- `AllowIssuingDomainSubdomains = false`: only allow exact issuing domains.
+- `EnforceIssuingDomainsForExistingAddresses = false` (default): existing addresses are not subject to the issuing-domain allowlist.
+- `EnforceIssuingDomainsForExistingAddresses = true`: also apply the allowlist to `CheckExistingAddress`.
+
+`IssuingDomains` are still automatically included in protected-domain checks. This
+allowlist controls accepted issuing domains; it does not disable other protections.
