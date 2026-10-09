@@ -16,6 +16,7 @@
 - Add regression cases for email usage, domain policy, multi-label suffix parsing, and a pinned subset of supported Unicode confusables.
 - Add parameterized BenchmarkDotNet scenarios for custom partial matching at 0, 100, 1,000, 5,000, and 10,000 participating reservations.
 - Add adversarial integration regression coverage for PSL wildcards and exceptions, private suffixes, long invalid mailbox rejection, large custom reservation collections, and internationalized identifiers.
+- Harden IDNA lookalike decoding against platform-specific invalid label exceptions, and extend defensive API tests across malformed mailbox input, randomized Unicode/control values, options capture, and ordinary success cases.
 - Clarify that the Core null-claimability behavior is not required-field validation and that email syntax checks are not domain verification, DNS resolution, authentication or authorization.
 - No performance or coverage claim is made until CI and benchmarks have completed.
 
