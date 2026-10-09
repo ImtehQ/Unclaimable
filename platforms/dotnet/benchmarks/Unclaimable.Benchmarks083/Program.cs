@@ -78,3 +78,36 @@ public class Email083Benchmarks
     public EmailResult ProtectedDomainLookalike() =>
         _checker.CheckExistingAddress("bluegarden@examp1ebrand.com");
 }
+
+ 
+// Scale partial matching independently of the built-in curated dataset.
+[MemoryDiagnoser]
+[SimpleJob(warmupCount: 2, iterationCount: 6)]
+public class PartialMatchingScale084Benchmarks
+{
+    [Params(0, 100, 1000, 5000, 10000)]
+    public int PartialEntryCount { get; set; }
+
+    private Checker _checker = null!;
+    private string _lastEntry = null!;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        var options = new Options();
+        options.DisableRule(Rule.ObfuscationMatching);
+        _lastEntry = "zzpartial" + (PartialEntryCount - 1).ToString("D5");
+        for (var index = 0; index < PartialEntryCount; index++)
+        {
+            options.AdditionalReserved.Add("zzpartial" + index.ToString("D5"));
+        }
+
+        _checker = new Checker(options);
+    }
+
+    [Benchmark]
+    public Result CheckMiss() => _checker.Check("zznomatchingreservationhere");
+
+    [Benchmark]
+    public Result CheckLateMatch() => _checker.Check("prefix" + _lastEntry + "suffix");
+}
