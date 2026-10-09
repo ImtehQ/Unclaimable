@@ -57,6 +57,8 @@ public sealed class EmailChecker : IEmailChecker
     private readonly global::Unclaimable.IChecker _localPartChecker;
     private readonly ProtectedDomain[] _protectedDomains;
     private readonly string[] _issuingDomains;
+    private readonly bool _allowIssuingDomainSubdomains;
+    private readonly bool _enforceIssuingDomainsForExistingAddresses;
     private readonly bool _detectUnicodeLookalikes;
     private readonly bool _detectTypographicalLookalikes;
     private readonly bool _detectProtectedLabelReuse;
@@ -98,6 +100,8 @@ public sealed class EmailChecker : IEmailChecker
                 "MaximumDomainEditDistance must be between 0 and 2.");
         }
 
+        _allowIssuingDomainSubdomains = options.AllowIssuingDomainSubdomains;
+        _enforceIssuingDomainsForExistingAddresses = options.EnforceIssuingDomainsForExistingAddresses;
         _detectUnicodeLookalikes = options.DetectUnicodeLookalikes;
         _detectTypographicalLookalikes = options.DetectTypographicalLookalikes;
         _detectProtectedLabelReuse = options.DetectProtectedLabelReuse;
@@ -152,10 +156,13 @@ public sealed class EmailChecker : IEmailChecker
 
         var localPartResult = _localPartChecker.Check(parsed!.LocalPart);
         var domainAssessment = AssessDomain(parsed.OriginalDomain, parsed.Domain);
+        var enforceIssuingDomains =
+            purpose == EmailAddressPurpose.NewAddress
+            || _enforceIssuingDomainsForExistingAddresses;
         var approvedIssuingDomain =
-            purpose != EmailAddressPurpose.NewAddress
+            !enforceIssuingDomains
             || _issuingDomains.Length == 0
-            || IsWithinConfiguredDomain(parsed.Domain, _issuingDomains);
+            || IsWithinConfiguredDomain(parsed.Domain, _issuingDomains, _allowIssuingDomainSubdomains);
 
         EmailFailureKind failureKind;
         if (localPartResult.IsReserved)
@@ -598,11 +605,15 @@ public sealed class EmailChecker : IEmailChecker
         return true;
     }
 
-    private static bool IsWithinConfiguredDomain(string candidate, string[] configuredDomains)
+    private static bool IsWithinConfiguredDomain(
+        string candidate,
+        string[] configuredDomains,
+        bool allowSubdomains)
     {
         for (var index = 0; index < configuredDomains.Length; index++)
         {
-            if (IsSameOrSubdomain(candidate, configuredDomains[index]))
+            if (string.Equals(candidate, configuredDomains[index], StringComparison.Ordinal)
+                || (allowSubdomains && IsSameOrSubdomain(candidate, configuredDomains[index])))
             {
                 return true;
             }
