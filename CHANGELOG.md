@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.4 - unreleased
+
+> **Compatibility:** The default `EmailUsage.Auto` and `EmailProtectionLevel.Strict` preserve the established strict email-validation behavior. No existing `EmailAddressPurpose` or `EmailFailureKind` values are changed. The package is not released yet.
+
+### Email policy
+- Add `EmailUsage` (`Auto`, `ExistingAddress`, `IssuedAddress`) and `EmailProtectionLevel` (`Strict`, `Relaxed`). Relaxed mode permits reserved-looking local parts and protected-domain resemblance on externally owned addresses while retaining these diagnostics in `EmailResult`. Syntax and explicit domain allowlists still apply, and issued addresses remain strictly protected.
+- Add `AllowIssuingDomainSubdomains` (default `true`) and `EnforceIssuingDomainsForExistingAddresses` (default `false`) for exact-domain allowlists and optional login/registration restrictions.
+- Replace the manually selected multi-label suffix list with a complete pinned offline Public Suffix List snapshot, including ICANN and private suffixes, wildcard rules and exceptions. The embedded upstream PSL has its own MPL-2.0 license.
+
+### Tests and performance
+- Add regression cases for email usage, domain policy, multi-label suffix parsing, and a pinned subset of supported Unicode confusables.
+- Add parameterized BenchmarkDotNet scenarios for custom partial matching at 0, 100, 1,000, 5,000, and 10,000 participating reservations.
+- No performance or coverage claim is made until CI and benchmarks have completed.
+
 ## 0.8.3 - 2026-10-09
 
 > **Default-behavior note:** 0.8.3 narrows several collision-prone identity-list defaults while preserving the broader lists behind `Options.IncludeHighCollisionIdentityTerms`. It also corrects Unicode, email-domain, obfuscation, numeric-normalization, and scoped-exception behavior.
