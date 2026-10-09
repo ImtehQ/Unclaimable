@@ -230,14 +230,8 @@ public sealed class EmailChecker : IEmailChecker
             return DomainAssessment.Safe;
         }
 
-        foreach (var protectedDomain in _protectedDomains)
-        {
-            if (IsSameOrSubdomain(normalizedDomain, protectedDomain.Domain))
-            {
-                return DomainAssessment.Safe;
-            }
-        }
-
+        // Trust of one configured domain must not suppress impersonation of
+        // another configured domain elsewhere in the same hostname.
         foreach (var protectedDomain in _protectedDomains)
         {
             if (normalizedDomain.StartsWith(protectedDomain.Domain + ".", StringComparison.Ordinal))
@@ -245,6 +239,16 @@ public sealed class EmailChecker : IEmailChecker
                 return new DomainAssessment(
                     DomainLookalikeKind.EmbeddedProtectedDomain,
                     protectedDomain.Domain);
+            }
+        }
+
+        // A genuine subdomain of a configured protected domain remains trusted
+        // unless it embeds another protected domain's name (checked above).
+        foreach (var protectedDomain in _protectedDomains)
+        {
+            if (IsSameOrSubdomain(normalizedDomain, protectedDomain.Domain))
+            {
+                return DomainAssessment.Safe;
             }
         }
 
