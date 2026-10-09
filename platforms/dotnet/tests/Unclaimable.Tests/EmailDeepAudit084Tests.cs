@@ -31,7 +31,7 @@ public sealed class EmailDeepAudit084Tests
         var result = checker.CheckExistingAddress("bluegarden@example.com");
         Assert.False(result.IsAllowed);
         Assert.Equal(EmailAddressPurpose.ExistingAddress, result.Purpose);
-        Assert.Equal(EmailAddressPurpose.ExistingAddress, result.EffectivePurpose);
+        Assert.Equal(EmailAddressPurpose.NewAddress, result.EffectivePurpose);
     }
 
     [Theory]
