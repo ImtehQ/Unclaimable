@@ -4,6 +4,97 @@ This guide explains how to keep Unclaimable's strict defaults while making small
 
 If you only need a working example, start with **Copy-paste recipes**. The later sections explain exactly which checks are skipped, which checks still run, and how the deny-first pipeline behaves.
 
+## 0.8.4 email and integration boundaries
+
+### Existing email addresses versus application-issued addresses
+
+`CheckExistingAddress` handles externally owned mailboxes. Its configured
+`IssuingDomains` allowlist is **not** enforced by default, to retain 0.8.3 behavior.
+`CheckNewAddress` handles mailboxes issued by the application, and enforces a
+configured `IssuingDomains` allowlist. Setting `EmailUsage` overrides the
+per-call purpose; leave `EmailUsage.Auto` to preserve existing callers.
+
+To restrict **existing** emails to exactly one approved domain:
+
+```csharp
+using Unclaimable.Email;
+
+var options = new EmailOptions
+{
+    EmailUsage = EmailUsage.ExistingAddress,
+    EnforceIssuingDomainsForExistingAddresses = true,
+    AllowIssuingDomainSubdomains = false
+};
+options.IssuingDomains.Add("example.com");
+var checker = new EmailChecker(options);
+bool allowed = checker.CheckExistingAddress("person@example.com").IsAllowed;
+```
+
+Set `AllowIssuingDomainSubdomains = true` to also permit real subdomains.
+These controls check configured domain strings; they do **not** authenticate
+ownership of the domain, a mailbox, or an enterprise account.
+
+### Relaxed checks for third-party mailboxes
+
+```csharp
+var options = new EmailOptions
+{
+    EmailUsage = EmailUsage.ExistingAddress,
+    EmailProtectionLevel = EmailProtectionLevel.Relaxed
+};
+var checker = new EmailChecker(options);
+var result = checker.CheckExistingAddress("support@example.com");
+bool allowed = result.IsAllowed;
+bool localPartReserved = result.LocalPartResult?.IsReserved == true;
+bool domainSuspicious = result.IsSuspiciousDomain;
+```
+
+With `Relaxed`, a syntactically valid externally owned address can pass despite
+reserved local-part or protected-domain warnings. The warnings remain available.
+Syntax failures and an explicitly enforced issuing-domain allowlist still deny.
+`Strict` is the default, and issued addresses remain strict regardless of
+`EmailProtectionLevel`. During login, validate ownership of the account and
+use established authentication/session controls; string validation alone is
+never authentication or authorization.
+
+### Email syntax is not proof of deliverability
+
+The package does **not** perform network DNS/MX queries, SMTP probes, mailbox
+verification, organizational ownership verification, or account authentication.
+Plausible domain syntax and similarity results must not be interpreted as proof
+that an address exists or receives email. Use an email ownership verification
+flow where needed.
+
+### Null and required identifier fields
+
+Core intentionally treats null as claimable to support optional inputs.
+`checker.IsClaimable(null)` is not a required-field validation. Validate
+requiredness explicitly:
+
+```csharp
+var checker = new Unclaimable.Checker();
+bool validForRegistration =
+    !string.IsNullOrWhiteSpace(candidate)
+    && checker.IsClaimable(candidate);
+```
+
+Enforce uniqueness separately in the database, and do not equate
+`IsClaimable` with permission to claim an identity.
+
+### Unicode and resource boundaries
+
+Confusable matching is a selective curated set, **not** full Unicode UTS #39
+conformance. Combining marks can be collapsed when creating a detection skeleton.
+Review internationalized legitimate names for false positives. The bundled
+Public Suffix List is a pinned offline snapshot, so suffix policy may become
+stale until an updated package is released.
+
+For untrusted inputs, impose request-body and identifier-length limits at
+application boundaries. Benchmark adversarial long strings, custom reservation
+set growth, and High/Extreme obfuscation independently before claiming
+denial-of-service resistance. No DoS vulnerability is established by the
+presence of expensive matching paths alone.
+
 ## Copy-paste recipes
 
 ### Use the default policy
