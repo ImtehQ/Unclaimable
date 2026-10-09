@@ -63,6 +63,8 @@ public sealed class EmailChecker : IEmailChecker
     private readonly bool _detectTypographicalLookalikes;
     private readonly bool _detectProtectedLabelReuse;
     private readonly int _maximumDomainEditDistance;
+    private readonly EmailUsage _emailUsage;
+    private readonly EmailProtectionLevel _emailProtectionLevel;
 
     /// <summary>Creates an email checker with default email options.</summary>
     public EmailChecker()
@@ -100,6 +102,16 @@ public sealed class EmailChecker : IEmailChecker
                 "MaximumDomainEditDistance must be between 0 and 2.");
         }
 
+        if (!Enum.IsDefined(typeof(EmailUsage), options.EmailUsage))
+        {
+            throw new ArgumentOutOfRangeException(nameof(options.EmailUsage));
+        }
+        if (!Enum.IsDefined(typeof(EmailProtectionLevel), options.EmailProtectionLevel))
+        {
+            throw new ArgumentOutOfRangeException(nameof(options.EmailProtectionLevel));
+        }
+        _emailUsage = options.EmailUsage;
+        _emailProtectionLevel = options.EmailProtectionLevel;
         _allowIssuingDomainSubdomains = options.AllowIssuingDomainSubdomains;
         _enforceIssuingDomainsForExistingAddresses = options.EnforceIssuingDomainsForExistingAddresses;
         _detectUnicodeLookalikes = options.DetectUnicodeLookalikes;
@@ -154,10 +166,17 @@ public sealed class EmailChecker : IEmailChecker
                 null);
         }
 
+        var effectivePurpose = _emailUsage == EmailUsage.Auto
+            ? purpose
+            : (_emailUsage == EmailUsage.IssuedAddress
+                ? EmailAddressPurpose.NewAddress
+                : EmailAddressPurpose.ExistingAddress);
+        var relaxedExisting = _emailProtectionLevel == EmailProtectionLevel.Relaxed
+            && effectivePurpose == EmailAddressPurpose.ExistingAddress;
         var localPartResult = _localPartChecker.Check(parsed!.LocalPart);
         var domainAssessment = AssessDomain(parsed.OriginalDomain, parsed.Domain);
         var enforceIssuingDomains =
-            purpose == EmailAddressPurpose.NewAddress
+            effectivePurpose == EmailAddressPurpose.NewAddress
             || _enforceIssuingDomainsForExistingAddresses;
         var approvedIssuingDomain =
             !enforceIssuingDomains
@@ -165,11 +184,11 @@ public sealed class EmailChecker : IEmailChecker
             || IsWithinConfiguredDomain(parsed.Domain, _issuingDomains, _allowIssuingDomainSubdomains);
 
         EmailFailureKind failureKind;
-        if (localPartResult.IsReserved)
+        if (localPartResult.IsReserved && !relaxedExisting)
         {
             failureKind = EmailFailureKind.ReservedLocalPart;
         }
-        else if (domainAssessment.Kind != DomainLookalikeKind.None)
+        else if (domainAssessment.Kind != DomainLookalikeKind.None && !relaxedExisting)
         {
             failureKind = EmailFailureKind.SuspiciousDomain;
         }
